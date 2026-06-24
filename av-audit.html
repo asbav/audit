@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="AV Audit"/>
+<meta name="theme-color" content="#ffffff"/>
+<title>AV Audit</title>
+<style>
+:root{
+  --bg:#ffffff;--bg2:#f5f5f5;--bg3:#efefef;
+  --text:#111111;--text2:#666666;--text3:#999999;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;
+  --amber:#EF9F27;--amber-bg:#FAEEDA;--amber-text:#854F0B;
+  --red-bg:#FAECE7;--red-text:#993C1D;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;
+  --purple-bg:#EEEDFE;--purple-text:#534AB7;
+  --radius:12px;--radius-sm:8px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a1a;--bg2:#252525;--bg3:#2e2e2e;
+    --text:#f0f0f0;--text2:#aaaaaa;--text3:#666666;
+    --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+    --green-bg:#04342C;--green-text:#5DCAA5;
+    --amber-bg:#412402;--amber-text:#FAC775;
+    --red-bg:#4A1B0C;--red-text:#F0997B;
+    --blue-bg:#042C53;--blue-text:#85B7EB;
+    --purple-bg:#26215C;--purple-text:#AFA9EC;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;background:var(--bg);color:var(--text)}
+#app{height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* Screens */
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem;padding-bottom:calc(1rem + var(--safe-bottom))}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:10px;padding:calc(12px + var(--safe-top)) 1rem 12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0}
+.hdr h2{font-size:17px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--text2);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);flex-shrink:0;font-size:20px}
+.icon-btn:active{background:var(--bg2)}
+
+/* Cards */
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:10px}
+.card-list{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+
+/* Badges */
+.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.b-ok{background:var(--green-bg);color:var(--green-text)}
+.b-warn{background:var(--red-bg);color:var(--red-text)}
+.b-amb{background:var(--amber-bg);color:var(--amber-text)}
+.b-none{background:var(--bg2);color:var(--text2)}
+
+/* Section label */
+.sec-lbl{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin:1.25rem 0 0.5rem;padding:0 2px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.stat{background:var(--bg2);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-n{font-size:26px;font-weight:700}
+.stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Room rows */
+.room-row{display:flex;align-items:center;gap:12px;padding:12px 1rem;border-bottom:0.5px solid var(--border);cursor:pointer;background:var(--bg)}
+.room-row:last-child{border-bottom:none}
+.room-row:active{background:var(--bg2)}
+.room-icon{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.room-info{flex:1;min-width:0}
+.room-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.pbar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
+.pfill{height:100%;border-radius:2px;transition:width 0.3s}
+
+/* Asset blocks */
+.asset-block{border-bottom:0.5px solid var(--border);overflow:hidden}
+.asset-block:last-child{border-bottom:none}
+.asset-hdr{display:flex;align-items:center;gap:10px;padding:12px 1rem;cursor:pointer;background:var(--bg)}
+.asset-hdr:active{background:var(--bg2)}
+.asset-name{font-size:15px;font-weight:600;flex:1}
+.asset-body{padding:0 1rem 12px;background:var(--bg)}
+
+/* Check rows */
+.check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.check-row:last-child{border-bottom:none}
+.check-lbl{flex:1;font-size:14px;line-height:1.4}
+.check-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.chk-grp{display:flex;gap:6px;flex-shrink:0;margin-top:2px}
+.cb{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2)}
+.cb.ok{background:var(--green-bg);border-color:var(--green);color:var(--green-text)}
+.cb.flag{background:var(--red-bg);border-color:#D85A30;color:var(--red-text)}
+.cb.na{background:var(--bg2);border-color:var(--border);color:var(--text3)}
+.cb:active{opacity:0.7}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.d-ok{background:var(--green)}.d-warn{background:var(--amber)}.d-none{background:var(--border2)}
+
+/* Inputs */
+textarea,input,select{font-family:inherit;font-size:14px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);width:100%}
+textarea{padding:8px 10px;resize:none;line-height:1.5;margin-top:8px}
+input{padding:10px 12px;height:44px}
+select{padding:10px 12px;height:44px}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--blue)}
+.asset-comment{border-left:3px solid var(--blue);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-top:12px}
+
+/* Buttons */
+.btn-primary{width:100%;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+.btn-primary:active{opacity:0.8}
+.btn-primary:disabled{opacity:0.35;cursor:not-allowed}
+.btn-secondary{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:var(--radius);font-size:15px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.btn-secondary:active{background:var(--bg2)}
+
+/* Form groups */
+.fg{margin-bottom:12px}
+.fg label{font-size:13px;color:var(--text2);display:block;margin-bottom:4px;font-weight:500}
+
+/* Task cards */
+.task-card{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.task-card:last-child{border-bottom:none}
+.task-chk{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;background:none;font-size:14px}
+.task-chk.on{background:var(--green-bg);border-color:var(--green);color:var(--green-text)}
+.task-info{flex:1;min-width:0}
+.task-title{font-size:14px;font-weight:600}
+.task-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.task-type{font-size:11px;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:4px;font-weight:500}
+.tt-flag{background:var(--red-bg);color:var(--red-text)}
+.tt-cable{background:var(--amber-bg);color:var(--amber-text)}
+.tt-tag{background:var(--blue-bg);color:var(--blue-text)}
+.tt-upgrade{background:var(--purple-bg);color:var(--purple-text)}
+.tt-other{background:var(--bg2);color:var(--text2)}
+
+/* Custom task row */
+.ct-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.ct-row input{flex:1;height:40px}
+.ct-row select{width:110px;height:40px;font-size:12px}
+.rm-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;padding:6px;flex-shrink:0;line-height:1}
+
+/* Info box */
+.info-box{background:var(--blue-bg);color:var(--blue-text);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;line-height:1.6;margin-bottom:14px}
+
+/* Save log */
+.log-line{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.log-line:last-child{border-bottom:none}
+.log-ok{color:var(--green)}.log-err{color:var(--red-text)}.log-spin{color:var(--blue)}
+
+/* Toast */
+#toast{position:fixed;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap;z-index:999}
+#toast.show{opacity:1}
+
+/* Spinner */
+.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:rot 0.6s linear infinite;flex-shrink:0}
+.spin-dark{border-color:rgba(0,0,0,0.15);border-top-color:var(--blue)}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Divider */
+.div{height:0.5px;background:var(--border);margin:14px 0}
+
+/* Setup screen hero */
+.hero{text-align:center;padding:2rem 0 1.5rem}
+.hero-icon{font-size:48px;margin-bottom:12px}
+.hero h1{font-size:24px;font-weight:700;margin-bottom:6px}
+.hero p{font-size:14px;color:var(--text2);line-height:1.6}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── SETUP ── -->
+<div id="s-setup" class="screen active">
+  <div class="scroll-body">
+    <div class="hero">
+      <div class="hero-icon">📺</div>
+      <h1>AV Audit</h1>
+      <p>Classroom AV inventory tool<br>for school walk-around audits</p>
+    </div>
+    <div class="info-box">
+      ℹ️ Freshservice calls are proxied through Claude's API to bypass browser restrictions. Your API key is used only in this session.
+    </div>
+    <div class="fg"><label>Freshservice domain</label><input id="fs-domain" type="text" placeholder="yourschool.freshservice.com" autocapitalize="none" autocorrect="off"/></div>
+    <div class="fg"><label>API key</label><input id="fs-key" type="password" placeholder="Paste your API key"/></div>
+    <div class="fg"><label>Anthropic API key</label><input id="anth-key" type="password" placeholder="sk-ant-…"/></div>
+    <div class="fg"><label>Ticket assignee group <span style="color:var(--text3);font-weight:400">(optional)</span></label><input id="fs-group" type="text" placeholder="e.g. IT Support"/></div>
+    <button class="btn-primary" onclick="connectFS()" id="connect-btn">Connect &amp; load rooms</button>
+    <button class="btn-secondary" onclick="loadDemo()">Preview with demo data</button>
+    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;line-height:1.6">Credentials are stored in this browser only<br>and cleared when you close the tab.</p>
+  </div>
+</div>
+
+<!-- ── ROOMS ── -->
+<div id="s-rooms" class="screen">
+  <div class="hdr">
+    <span style="font-size:20px">🏫</span>
+    <h2 id="rooms-title">Classrooms</h2>
+    <button class="icon-btn" onclick="showScreen('s-setup')" title="Settings">⚙️</button>
+  </div>
+  <div class="scroll-body" style="padding:1rem">
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="st-rooms">0</div><div class="stat-l">rooms</div></div>
+      <div class="stat"><div class="stat-n" id="st-flags">0</div><div class="stat-l">flagged items</div></div>
+    </div>
+    <div class="card-list" id="room-list"></div>
+    <button class="btn-secondary" id="export-btn" onclick="exportCSV()" style="display:none">📥 Export full audit CSV</button>
+  </div>
+</div>
+
+<!-- ── ROOM DETAIL ── -->
+<div id="s-room" class="screen">
+  <div class="hdr">
+    <button class="icon-btn" onclick="goRooms()">←</button>
+    <h2 id="room-title">Room</h2>
+    <span id="room-badge" class="badge b-none">0%</span>
+  </div>
+  <div class="scroll-body" id="room-scroll">
+    <div id="room-body"></div>
+    <div class="sec-lbl">Tasks to create in Freshservice</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Flagged checks auto-generate tickets. Add extra room tasks below.</p>
+      <div id="task-list"></div>
+      <div class="div"></div>
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">Add room-level task</p>
+      <div id="custom-tasks"></div>
+      <button class="btn-secondary" onclick="addCustomTask()" style="margin-top:4px">+ Add task</button>
+    </div>
+    <button class="btn-primary" id="save-btn" onclick="saveRoom()">☁️ Save to Freshservice</button>
+    <div style="height:1rem"></div>
+  </div>
+</div>
+
+<!-- ── SAVING ── -->
+<div id="s-saving" class="screen">
+  <div class="hdr"><h2>Saving…</h2></div>
+  <div class="scroll-body">
+    <div class="card">
+      <p style="font-size:15px;font-weight:600;margin-bottom:12px" id="save-label">Room</p>
+      <div id="save-log"></div>
+    </div>
+    <button class="btn-primary" id="done-btn" onclick="goRooms()" style="display:none">← Back to rooms</button>
+  </div>
+</div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+const CHECKS=[
+  {id:"disp_type",label:"Display type recorded",sub:"TV / projector / LED — confirm model",opts:["ok","flag"]},
+  {id:"disp_mount",label:"Mount secure & stable",sub:"Wall / trolley / wooden box",opts:["ok","flag"]},
+  {id:"disp_clean",label:"Screen clean, no damage",sub:"Cracks, burn-in, dead pixels",opts:["ok","flag"]},
+  {id:"disp_tag",label:"Asset tag present & legible",sub:"FS sticker on device body",opts:["ok","flag"]},
+  {id:"conn_hdmi",label:"HDMI cable present & working",sub:"Test signal end-to-end",opts:["ok","flag","na"]},
+  {id:"conn_conv",label:"HDMI adaptor/convertor in place",sub:"Type-C or other convertor",opts:["ok","flag","na"]},
+  {id:"conn_atv",label:"Apple TV powered & connected",sub:"Firmware & remote battery OK",opts:["ok","flag","na"]},
+  {id:"conn_remote",label:"Remote labelled & stored",sub:"Sticker with room/device name",opts:["ok","flag","na"]},
+  {id:"conn_dongle",label:"Dongle tagged & secured",sub:"Labelled, not loose",opts:["ok","flag","na"]},
+  {id:"aud_works",label:"Audio output working",sub:"Built-in / Telome / external",opts:["ok","flag"]},
+  {id:"aud_cable",label:"Speaker cables managed",sub:"No exposed or trailing wires",opts:["ok","flag","na"]},
+  {id:"gen_cables",label:"Cable management tidy",sub:"Velcro, trays, or ducting",opts:["ok","flag"]},
+  {id:"gen_labels",label:"All cables labelled at both ends",sub:"HDMI source/dest tags",opts:["ok","flag"]},
+  {id:"gen_access",label:"Teacher can operate independently",sub:"No workarounds needed",opts:["ok","flag"]},
+];
+const TTYPES=[
+  {value:"flag",label:"Flagged issue",cls:"tt-flag"},
+  {value:"cable",label:"Cable management",cls:"tt-cable"},
+  {value:"tag",label:"Print tags/stickers",cls:"tt-tag"},
+  {value:"upgrade",label:"Upgrade / replace",cls:"tt-upgrade"},
+  {value:"other",label:"Other",cls:"tt-other"},
+];
+
+let cfg={domain:"",fsKey:"",anthKey:"",group:""};
+let rooms=[];
+let audit={};
+let currentRoom=null;
+let customTasks={};
+let expanded={};
+let autoSel={};
+
+// ── Persist config in localStorage ──
+function saveConfig(){try{localStorage.setItem("av_cfg",JSON.stringify(cfg));}catch(e){}}
+function loadConfig(){try{const c=JSON.parse(localStorage.getItem("av_cfg")||"{}");if(c.domain)cfg=c;if(cfg.domain)document.getElementById("fs-domain").value=cfg.domain;if(cfg.fsKey)document.getElementById("fs-key").value=cfg.fsKey;if(cfg.anthKey)document.getElementById("anth-key").value=cfg.anthKey;if(cfg.group)document.getElementById("fs-group").value=cfg.group;}catch(e){}}
+
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function toast(msg,dur=3000){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),dur);}
+
+// ── Claude as CORS proxy ──
+async function fsProxy(method,path,body){
+  const prompt=`You are a Freshservice REST API proxy. Make exactly this HTTP request and respond with ONLY a raw JSON object — no markdown, no explanation, no backticks.
+
+The JSON must have exactly two keys:
+- "status": the HTTP response status code (integer)
+- "body": the full parsed JSON response body (object or null if empty)
+
+Request:
+METHOD: ${method}
+URL: https://${cfg.domain}${path}
+Authorization: Basic ${btoa(cfg.fsKey+":X")}
+Content-Type: application/json
+Body: ${body?JSON.stringify(body):"(none)"}`;
+
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":cfg.anthKey,"anthropic-version":"2023-06-01"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4096,messages:[{role:"user",content:prompt}]})
+  });
+  if(!res.ok){const e=await res.text();throw new Error("Claude API "+res.status+": "+e.slice(0,300));}
+  const data=await res.json();
+  const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("").trim();
+  const clean=text.replace(/^```json\s*/,"").replace(/\s*```$/,"").trim();
+  try{return JSON.parse(clean);}catch(e){throw new Error("Proxy parse error: "+clean.slice(0,200));}
+}
+
+function getAudit(rid){if(!audit[rid])audit[rid]={assets:{}};return audit[rid];}
+function getAsset(rid,aid){const a=getAudit(rid);const k=String(aid);if(!a.assets[k])a.assets[k]={checks:{},notes:{},comment:""};return a.assets[k];}
+
+function roomProgress(rid){
+  const r=rooms.find(x=>x.id===rid);if(!r)return{total:0,done:0,flags:0,pct:0};
+  let done=0,flags=0;
+  const total=r.assets.length*CHECKS.length;
+  r.assets.forEach(a=>{
+    const as=getAsset(rid,a.id);
+    CHECKS.forEach(c=>{if(as.checks[c.id]){done++;if(as.checks[c.id]==="flag")flags++;}});
+  });
+  return{total,done,flags,pct:total?Math.round(done/total*100):0};
+}
+
+async function connectFS(){
+  const domain=document.getElementById("fs-domain").value.trim();
+  const fsKey=document.getElementById("fs-key").value.trim();
+  const anthKey=document.getElementById("anth-key").value.trim();
+  if(!domain||!fsKey){toast("Enter your Freshservice domain and API key");return;}
+  if(!anthKey){toast("Enter your Anthropic API key");return;}
+  cfg={domain,fsKey,anthKey,group:document.getElementById("fs-group").value.trim()};
+  saveConfig();
+  const btn=document.getElementById("connect-btn");
+  btn.innerHTML='<div class="spin"></div> Connecting…';btn.disabled=true;
+  try{
+    const result=await fsProxy("GET","/api/v2/assets?per_page=100&page=1",null);
+    if(result.status>=400)throw new Error("Freshservice error "+result.status+". Check your API key and domain.");
+    const assets=(result.body&&(result.body.assets||result.body.items))||[];
+    rooms=groupByLocation(assets);
+    if(!rooms.length){toast("No assets found. Make sure assets have a location set in Freshservice.");return;}
+    toast("Loaded "+rooms.length+" location"+(rooms.length!==1?"s",""));
+    goRooms();
+  }catch(e){
+    toast("Failed: "+e.message,6000);
+    console.error(e);
+  }finally{
+    btn.innerHTML="Connect &amp; load rooms";btn.disabled=false;
+  }
+}
+
+function groupByLocation(assets){
+  const map={};
+  assets.forEach(a=>{
+    const loc=a.location_name||a.location||"No location set";
+    if(!map[loc])map[loc]={name:loc,id:"loc_"+encodeURIComponent(loc),assets:[]};
+    map[loc].assets.push({id:a.id,name:a.display_name||a.name||"Asset "+a.id});
+  });
+  return Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
+}
+
+function loadDemo(){
+  rooms=[
+    {id:"r101",name:"Room 101 — Science",assets:[{id:1001,name:'Samsung 75" TV'},{id:1002,name:"Apple TV 4K"},{id:1003,name:"HDMI-C adaptor"}]},
+    {id:"rhall",name:"Main Hall",assets:[{id:2001,name:"Epson EB-X51 Projector"},{id:2002,name:"Telome speaker set"}]},
+    {id:"rlib",name:"Library",assets:[{id:3001,name:'LG 65" TV (trolley)'},{id:3002,name:"Wireless dongle"}]},
+    {id:"r204",name:"Room 204 — Art",assets:[{id:4001,name:'BenQ 70" Interactive'},{id:4002,name:"Built-in speaker bar"}]},
+    {id:"r305",name:"Room 305 — English",assets:[{id:5001,name:'Hisense 55" TV'},{id:5002,name:"Apple TV (gen 3)"},{id:5003,name:"HDMI cable x2"}]},
+  ];
+  cfg={domain:"",fsKey:"",anthKey:"",group:""};
+  goRooms();
+}
+
+function goRooms(){renderRooms();showScreen("s-rooms");}
+
+function renderRooms(){
+  let totalFlags=0;
+  document.getElementById("room-list").innerHTML=rooms.map(r=>{
+    const{pct,flags,done,total}=roomProgress(r.id);
+    totalFlags+=flags;
+    const col=flags>0?"var(--amber)":pct===100?"var(--green)":"var(--blue)";
+    const bdg=flags>0?`<span class="badge b-warn">${flags} flagged</span>`:pct===100?`<span class="badge b-ok">Done ✓</span>`:`<span class="badge b-none">${done}/${total}</span>`;
+    return`<div class="room-row" onclick="openRoom('${r.id}')">
+      <div class="room-icon">📺</div>
+      <div class="room-info">
+        <div class="room-name">${esc(r.name)}</div>
+        <div class="room-sub">${r.assets.length} asset${r.assets.length!==1?"s":""}</div>
+        <div class="pbar"><div class="pfill" style="width:${pct}%;background:${col}"></div></div>
+      </div>
+      ${bdg}
+    </div>`;
+  }).join("");
+  document.getElementById("st-rooms").textContent=rooms.length;
+  document.getElementById("st-flags").textContent=totalFlags;
+  document.getElementById("export-btn").style.display=rooms.every(r=>roomProgress(r.id).pct===100)?"flex":"none";
+}
+
+function openRoom(id){
+  currentRoom=rooms.find(r=>r.id===id);
+  if(!customTasks[id])customTasks[id]=[];
+  if(!autoSel[id])autoSel[id]={};
+  document.getElementById("room-title").textContent=currentRoom.name;
+  renderRoomBody();renderTaskList();renderCustomTasks();
+  showScreen("s-room");
+  document.getElementById("room-scroll").scrollTop=0;
+  updateBadge();
+}
+
+function updateBadge(){
+  const{pct,flags}=roomProgress(currentRoom.id);
+  const b=document.getElementById("room-badge");
+  if(flags>0){b.textContent=flags+" flagged";b.className="badge b-warn";}
+  else if(pct===100){b.textContent="Complete";b.className="badge b-ok";}
+  else{b.textContent=pct+"%";b.className="badge b-none";}
+}
+
+function renderRoomBody(){
+  const rid=currentRoom.id;
+  let html="";
+  currentRoom.assets.forEach(asset=>{
+    const as=getAsset(rid,asset.id);
+    const isOpen=!!expanded[rid+"_"+asset.id];
+    const flagCount=Object.values(as.checks).filter(v=>v==="flag").length;
+    const doneCount=Object.keys(as.checks).length;
+    const statusIcon=flagCount>0?"⚠️":doneCount===CHECKS.length?"✅":"⬜";
+    html+=`<div class="card-list" style="margin-bottom:8px">
+      <div class="asset-hdr" onclick="toggleAsset('${rid}','${asset.id}')">
+        <span style="font-size:18px;flex-shrink:0">${statusIcon}</span>
+        <span class="asset-name">${esc(asset.name)}</span>
+        <span style="font-size:14px;color:var(--text2)">${isOpen?"▲":"▼"}</span>
+      </div>`;
+    if(isOpen){
+      html+=`<div class="asset-body">`;
+      CHECKS.forEach(c=>{
+        const val=as.checks[c.id]||"";
+        const note=as.notes[c.id]||"";
+        html+=`<div class="check-row">
+          <div class="dot ${val==="ok"?"d-ok":val==="flag"?"d-warn":"d-none"}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="check-lbl">${esc(c.label)}<div class="check-sub">${esc(c.sub)}</div></div>
+            ${val==="flag"?`<textarea rows="2" placeholder="Describe the issue…" oninput="setNote('${asset.id}','${c.id}',this.value)">${esc(note)}</textarea>`:""}
+          </div>
+          <div class="chk-grp">
+            <button class="cb ${val==="ok"?"ok":""}" onclick="setCheck('${rid}','${asset.id}','${c.id}','ok')">✓</button>
+            <button class="cb ${val==="flag"?"flag":""}" onclick="setCheck('${rid}','${asset.id}','${c.id}','flag')">!</button>
+            ${c.opts.includes("na")?`<button class="cb ${val==="na"?"na":""}" onclick="setCheck('${rid}','${asset.id}','${c.id}','na')">—</button>`:""}
+          </div>
+        </div>`;
+      });
+      html+=`<textarea class="asset-comment" rows="2" placeholder="Asset notes (saved as comment in Freshservice)…" oninput="setComment('${rid}','${asset.id}',this.value)">${esc(as.comment)}</textarea>`;
+      html+="</div>";
+    }
+    html+="</div>";
+  });
+  document.getElementById("room-body").innerHTML=html;
+}
+
+function toggleAsset(rid,aid){const k=rid+"_"+aid;expanded[k]=!expanded[k];renderRoomBody();}
+function setCheck(rid,aid,cid,val){const as=getAsset(rid,aid);as.checks[cid]=val;if(val!=="flag")delete as.notes[cid];renderRoomBody();renderTaskList();updateBadge();}
+function setNote(aid,cid,val){getAsset(currentRoom.id,aid).notes[cid]=val;renderTaskList();}
+function setComment(rid,aid,val){getAsset(rid,aid).comment=val;}
+
+function buildAutoTasks(){
+  const rid=currentRoom.id;const tasks=[];
+  currentRoom.assets.forEach(asset=>{
+    const as=getAsset(rid,asset.id);
+    CHECKS.forEach(c=>{
+      if(as.checks[c.id]==="flag"){
+        tasks.push({id:"auto_"+asset.id+"_"+c.id,type:"flag",title:c.label+" — "+asset.name,detail:as.notes[c.id]||""});
+      }
+    });
+  });
+  return tasks;
+}
+
+function renderTaskList(){
+  const tasks=buildAutoTasks();
+  tasks.forEach(t=>{if(autoSel[currentRoom.id][t.id]===undefined)autoSel[currentRoom.id][t.id]=true;});
+  let html="";
+  if(!tasks.length){
+    html=`<p style="font-size:13px;color:var(--text2);padding:4px 0 8px">No flagged items yet — they appear here automatically when you flag a check above.</p>`;
+  }else{
+    tasks.forEach(t=>{
+      const sel=autoSel[currentRoom.id][t.id]!==false;
+      const tt=TTYPES.find(x=>x.value===t.type)||TTYPES[0];
+      html+=`<div class="task-card">
+        <button class="task-chk ${sel?"on":""}" onclick="toggleAutoTask('${t.id}')">${sel?"✓":""}</button>
+        <div class="task-info">
+          <div class="task-title">${esc(t.title)}</div>
+          ${t.detail?`<div class="task-sub">${esc(t.detail)}</div>`:""}
+          <span class="task-type ${tt.cls}">${tt.label}</span>
+        </div>
+      </div>`;
+    });
+  }
+  document.getElementById("task-list").innerHTML=html;
+}
+
+function toggleAutoTask(id){autoSel[currentRoom.id][id]=!(autoSel[currentRoom.id][id]!==false);renderTaskList();}
+
+function renderCustomTasks(){
+  const tasks=customTasks[currentRoom.id]||[];
+  document.getElementById("custom-tasks").innerHTML=tasks.map((t,i)=>`
+    <div class="ct-row">
+      <input type="text" value="${esc(t.title)}" placeholder="Task description…" oninput="updateCT(${i},'title',this.value)"/>
+      <select onchange="updateCT(${i},'type',this.value)">
+        ${TTYPES.map(tt=>`<option value="${tt.value}" ${t.type===tt.value?"selected":""}>${tt.label}</option>`).join("")}
+      </select>
+      <button class="rm-btn" onclick="removeCT(${i})">✕</button>
+    </div>`).join("");
+}
+
+function addCustomTask(){customTasks[currentRoom.id].push({title:"",type:"cable"});renderCustomTasks();}
+function updateCT(i,f,v){customTasks[currentRoom.id][i][f]=v;}
+function removeCT(i){customTasks[currentRoom.id].splice(i,1);renderCustomTasks();}
+
+function logLine(id,icon,msg,cls){
+  const el=document.getElementById("save-log");
+  const div=document.getElementById("ll_"+id)||null;
+  const html=`<div id="ll_${id}" class="log-line"><span class="${cls}" style="flex-shrink:0">${icon}</span><span>${esc(msg)}</span></div>`;
+  if(div)div.outerHTML=html;else el.insertAdjacentHTML("beforeend",html);
+}
+
+async function saveRoom(){
+  const rid=currentRoom.id;
+  const isDemo=!cfg.anthKey;
+  const now=new Date().toISOString().slice(0,10);
+  const autoTasks=buildAutoTasks().filter(t=>autoSel[rid]&&autoSel[rid][t.id]!==false);
+  const custTasks=(customTasks[rid]||[]).filter(t=>t.title.trim());
+  const allTasks=[...autoTasks,...custTasks];
+
+  if(isDemo){
+    toast(`Demo: would update ${currentRoom.assets.length} assets & create ${allTasks.length} ticket${allTasks.length!==1?"s":""}`,4000);
+    return;
+  }
+
+  document.getElementById("save-label").textContent=currentRoom.name;
+  document.getElementById("save-log").innerHTML="";
+  document.getElementById("done-btn").style.display="none";
+  showScreen("s-saving");
+
+  for(const asset of currentRoom.assets){
+    const as=getAsset(rid,asset.id);
+    const flags=CHECKS.filter(c=>as.checks[c.id]==="flag").map(c=>`  • ${c.label}${as.notes[c.id]?": "+as.notes[c.id]:""}`).join("\n");
+    const oks=CHECKS.filter(c=>as.checks[c.id]==="ok").map(c=>`  • ${c.label}`).join("\n");
+    const desc=[`AV Audit — ${now}`,as.comment?"\n"+as.comment:"",oks?"\n\n✓ OK:\n"+oks:"",flags?"\n\n⚠ Flagged:\n"+flags:""].join("").trim();
+    logLine("a"+asset.id,"⏳","Updating "+asset.name+"…","log-spin");
+    try{
+      const r=await fsProxy("PUT","/api/v2/assets/"+asset.id,{asset:{description:desc,last_audit_date:now}});
+      if(r.status>=400)throw new Error("Status "+r.status);
+      logLine("a"+asset.id,"✅",asset.name+" updated","log-ok");
+    }catch(e){logLine("a"+asset.id,"❌",asset.name+" failed: "+e.message,"log-err");}
+  }
+
+  for(const task of allTasks){
+    const tt=TTYPES.find(x=>x.value===task.type)||TTYPES[0];
+    logLine("t"+task.id,"⏳","Ticket: "+task.title.slice(0,50)+"…","log-spin");
+    try{
+      const r=await fsProxy("POST","/api/v2/tickets",{
+        subject:"[AV Audit] "+task.title,
+        description:`Room: ${currentRoom.name}\nType: ${tt.label}\n${task.detail||task.title}\n\nRaised by AV Audit on ${now}.`,
+        type:"Incident",priority:2,...(cfg.group?{group_name:cfg.group}:{})
+      });
+      if(r.status>=400)throw new Error("Status "+r.status);
+      logLine("t"+task.id,"✅","Ticket created: "+task.title.slice(0,50),"log-ok");
+    }catch(e){logLine("t"+task.id,"❌","Ticket failed: "+e.message,"log-err");}
+  }
+
+  document.getElementById("done-btn").style.display="flex";
+}
+
+function exportCSV(){
+  let csv="Room,Asset,Check,Status,Notes,Asset comment\n";
+  rooms.forEach(r=>{
+    r.assets.forEach(a=>{
+      const as=getAsset(r.id,a.id);
+      CHECKS.forEach(c=>{
+        const v=as.checks[c.id]||"not checked";
+        csv+=`"${r.name}","${a.name}","${c.label}","${v}","${(as.notes[c.id]||"").replace(/"/g,'""')}","${(as.comment||"").replace(/"/g,'""')}"\n`;
+      });
+    });
+  });
+  const url=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  const a=document.createElement("a");a.href=url;a.download="av_audit_"+new Date().toISOString().slice(0,10)+".csv";a.click();
+  toast("CSV exported ✓");
+}
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+loadConfig();
+</script>
+</body>
+</html>
