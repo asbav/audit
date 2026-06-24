@@ -146,6 +146,8 @@ textarea:focus,input:focus,select:focus{outline:none;border-color:var(--blue)}
     <div class="fg"><label>Ticket assignee group <span style="color:var(--text3);font-weight:400">(optional)</span></label><input id="fs-group" type="text" placeholder="e.g. IT Support"/></div>
     <button class="btn-primary" onclick="connectFS()" id="connect-btn">Connect &amp; load rooms</button>
     <button class="btn-secondary" onclick="loadDemo()">Preview with demo data</button>
+    <button class="btn-secondary" onclick="runDiagnostic()" id="diag-btn" style="border-color:var(--amber);color:var(--amber-text)">🔍 Run connection diagnostic</button>
+    <div id="diag-result" style="display:none;margin-top:12px;background:var(--bg2);border-radius:var(--radius-sm);padding:12px;font-size:12px;font-family:monospace;line-height:1.7;word-break:break-all;white-space:pre-wrap"></div>
     <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;line-height:1.6">Credentials are saved in this browser only<br>and never sent anywhere except Freshservice.</p>
   </div>
 </div>
@@ -629,6 +631,28 @@ function esc(s){
   return String(s||"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;")
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+async function runDiagnostic(){
+  const domain=document.getElementById("fs-domain").value.trim();
+  const key=document.getElementById("fs-key").value.trim();
+  if(!domain||!key){toast("Enter domain and API key first");return;}
+  const btn=document.getElementById("diag-btn");
+  const out=document.getElementById("diag-result");
+  btn.textContent="Running…";btn.disabled=true;
+  out.style.display="block";
+  out.textContent="Connecting to /api/test…";
+  try{
+    const res=await fetch("/api/test",{
+      headers:{"x-fs-domain":domain,"x-fs-key":key,"Content-Type":"application/json"}
+    });
+    const data=await res.json();
+    out.textContent=JSON.stringify(data,null,2);
+  }catch(e){
+    out.textContent="Error: "+e.message;
+  }finally{
+    btn.textContent="🔍 Run connection diagnostic";btn.disabled=false;
+  }
 }
 
 loadConfig();
