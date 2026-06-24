@@ -316,13 +316,13 @@ async function connectFS(){
       console.log("Location fields on first asset:",result.locationDebug);
     }
     btn.innerHTML='<div class="spin"></div> Grouping '+assets.length+' assets…';
-    rooms=groupByLocation(assets, result.locationDebug);
-    const noLoc=rooms.find(r=>r.name.startsWith("No location"));
-    const locCount=rooms.filter(r=>!r.name.startsWith("No location")).length;
-    let msg="Loaded "+assets.length+" assets";
-    if(locCount>0) msg+=" across "+locCount+" location"+(locCount!==1?"s":"");
+    rooms=groupByLocation(assets);
+    const noLoc=rooms.find(r=>r.name==="No location set");
+    const locRooms=rooms.filter(r=>r.name!=="No location set");
+    let msg="Loaded "+assets.length+" hardware assets across "+locRooms.length+" location"+(locRooms.length!==1?"s":"");
     if(noLoc) msg+=" ("+noLoc.assets.length+" unassigned)";
     toast(msg, 4000);
+    if(result.locations_loaded) console.log("Locations loaded:",result.locations_loaded);
     goRooms();
   }catch(e){
     toast("Failed: "+e.message,7000);
@@ -332,40 +332,13 @@ async function connectFS(){
   }
 }
 
-function extractLocation(a, debug){
-  // Try every known field Freshservice uses for location
-  if(a.location_name && typeof a.location_name==="string") return a.location_name;
-  if(a.location){
-    if(typeof a.location==="string") return a.location;
-    if(a.location.name) return a.location.name;
-  }
-  // type_fields contains custom/asset-type-specific fields
-  if(a.type_fields){
-    const tf=a.type_fields;
-    // Common field names Freshservice uses
-    const keys=["location","location_name","location_id","room","department","site","building","floor"];
-    for(const k of keys){
-      if(tf[k] && typeof tf[k]==="string") return tf[k];
-    }
-    // Also check any key with "loc" in the name
-    for(const k of Object.keys(tf)){
-      if(k.toLowerCase().includes("loc") && tf[k] && typeof tf[k]==="string") return tf[k];
-    }
-  }
-  if(a.department_name) return a.department_name;
-  if(a.site_name) return a.site_name;
-  return "No location set";
-}
-
-function groupByLocation(assets, debug){
+function groupByLocation(assets){
+  // location_name is pre-resolved by the proxy from location_id
   const map={};
   assets.forEach(a=>{
-    const loc=extractLocation(a, debug);
+    const loc = a.location_name || "No location set";
     if(!map[loc])map[loc]={name:loc,id:"loc_"+encodeURIComponent(loc),assets:[]};
-    map[loc].assets.push({
-      id:   a.id,
-      name: a.display_name||a.name||a.asset_tag||"Asset "+a.id,
-    });
+    map[loc].assets.push({ id: a.id, name: a.name });
   });
   return Object.values(map).sort((a,b)=>{
     if(a.name==="No location set") return 1;
