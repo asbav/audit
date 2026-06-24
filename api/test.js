@@ -2,50 +2,74 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,x-fs-domain,x-fs-key");
-
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const domain = req.headers["x-fs-domain"];
   const key    = req.headers["x-fs-key"];
-
   if (!domain || !key) return res.status(400).json({ error: "Missing headers" });
 
   const auth    = "Basic " + Buffer.from(key + ":X").toString("base64");
   const headers = { "Authorization": auth, "Content-Type": "application/json" };
-
   const results = {};
 
-  // Test 1: Can we reach Freshservice at all?
+  // 1. Find the Hardware asset type ID
   try {
-    const r = await fetch(`https://${domain}/api/v2/agents/me`, { headers });
+    const r = await fetch(`https://${domain}/api/v2/asset_types?per_page=100`, { headers });
     const d = await r.json();
-    results.auth = { status: r.status, name: d.agent?.first_name || d.first_name || "unknown", role: d.agent?.role_ids || d.role_ids };
-  } catch(e) { results.auth = { error: e.message }; }
-
-  // Test 2: Assets endpoint - just 1 asset
-  try {
-    const r = await fetch(`https://${domain}/api/v2/assets?per_page=1&page=1`, { headers });
-    const d = await r.json();
-    const first = (d.assets||d.config_items||d.items||[])[0] || null;
-    results.assets_v2 = {
-      status: r.status,
-      total: d.total || d.meta?.total_count || "unknown",
-      first_asset_keys: first ? Object.keys(first) : [],
-      location_fields: first ? {
-        location:      first.location,
-        location_name: first.location_name,
-        location_id:   first.location_id,
-        type_fields:   first.type_fields || {},
-      } : null,
-    };
-  } catch(e) { results.assets_v2 = { error: e.message }; }
-
-  // Test 3: Try asset types endpoint
-  try {
-    const r = await fetch(`https://${domain}/api/v2/asset_types`, { headers });
-    const d = await r.json();
-    results.asset_types = { status: r.status, types: (d.asset_types||[]).map(t=>t.name) };
+    const types = d.asset_types || [];
+    const hw = types.find(t => t.name.toLowerCase() === "hardware");
+    const hwRelated = types.filter(t =>
+      t.name.toLowerCase().includes("hardware") ||
+      (hw && t.parent_asset_type_id === hw.id)
+    );
+    results.hardware_type    = hw ? { id: hw.id, name: hw.name } : "NOT FOUND";
+    results.hardware_children = hwRelated.map(t => ({ id: t.id, name: t.name, parent: t.parent_asset_type_id }));
   } catch(e) { results.asset_types = { error: e.message }; }
+
+  // 2. Fetch 3 assets filtered to Hardware type
+  try {
+    const r2 = await fetch(`https://${domain}/api/v2/asset_types?per_page=100`, { headers });
+    const d2  = await r2.json();
+    const hw  = (d2.asset_types||[]).find(t => t.name.toLowerCase() === "hardware");
+    if (hw) {
+      const r = await fetch(`https://${domain}/api/v2/assets?asset_type_id=${hw.id}&per_page=3`, { headers });
+      const d = await r.json();
+      const assets = d.assets || [];
+      results.hardware_assets_sample = assets.map(a => ({
+        id:            a.id,
+        name:          a.name,
+        display_name:  a.display_name,
+        asset_tag:     a.asset_tag,
+        location_id:   a.location_id,
+        department_id: a.department_id,
+        type_fields:   a.type_fields,
+      }));
+      results.hardware_total = d.total || "unknown";
+    } else {
+      results.hardware_assets_sample = "Hardware type not found by name";
+    }
+  } catch(e) { results.hardware_sample = { error: e.message }; }
+
+  // 3. Fetch locations list
+  try {
+    const r = await fetch(`https://${domain}/api/v2/locations?per_page=100`, { headers });
+    const d = await r.json();
+    results.locations = (d.locations||[]).map(l => ({ id: l.id, name: l.name, parent_id: l.parent_location_id }));
+    results.locations_total = results.locations.length;
+  } catch(e) { results.locations = { error: e.message }; }
+
+  // 4. Try fetching 1 asset that actually HAS a location_id set
+  try {
+    const r = await fetch(`https://${domain}/api/v2/assets?per_page=100&page=1`, { headers });
+    const d = await r.json();
+    const withLoc = (d.assets||[]).find(a => a.location_id);
+    results.first_asset_with_location = withLoc ? {
+      id:          withLoc.id,
+      name:        withLoc.name,
+      location_id: withLoc.location_id,
+      type_fields: withLoc.type_fields,
+    } : "none in first 100 assets";
+  } catch(e) { results.located_asset = { error: e.message }; }
 
   return res.status(200).json(results);
 }
