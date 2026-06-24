@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/", "destination": "/av-audit.html" }]
+  "rewrites": [
+    { "source": "/api/proxy", "destination": "/api/proxy" },
+    { "source": "/",          "destination": "/av-audit.html" }
+  ]
 }
