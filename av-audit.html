@@ -256,14 +256,15 @@ function toast(msg,dur=3000){
   setTimeout(()=>t.classList.remove("show"),dur);
 }
 
-// Calls our Vercel serverless proxy — no CORS, no Anthropic key
-async function fsCall(method, path, body){
+// Calls our Vercel serverless proxy -- no CORS, no Anthropic key
+async function fsCall(method, path, body, action){
   const res = await fetch("/api/proxy?path="+encodeURIComponent(path), {
     method,
     headers:{
       "Content-Type":  "application/json",
       "x-fs-domain":   cfg.domain,
       "x-fs-key":      cfg.key,
+      "x-fs-action":   action||"passthrough",
     },
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -300,22 +301,26 @@ async function connectFS(){
   btn.innerHTML='<div class="spin"></div> Loading assets…';btn.disabled=true;
   try{
     // Proxy handles full pagination — just one call needed
-    const result=await fsCall("GET","/api/v2/assets");
-    if(result.error)throw new Error(result.error+(result.detail?" — "+result.detail:""));
+    const result=await fsCall("GET","/api/v2/assets",null,"fetch-all-assets");
+    if(result.error)throw new Error(result.error+(result.detail?" Details: "+result.detail:""));
     const assets=result.assets||result.items||[];
     if(!assets.length){
       toast("No assets returned. Check API key permissions in Freshservice.",6000);
       console.warn("Raw response:",result);
       return;
     }
-    btn.innerHTML='<div class="spin"></div> Grouping '+assets.length+' assets…';
-    rooms=groupByLocation(assets);
-    // Include rooms with no location as individual entries
-    if(!rooms.length){
-      toast("Assets found ("+assets.length+") but none have a location set in Freshservice.",6000);
-      return;
+    // Log location fields from first asset so we can see what FS returns
+    if(result.locationDebug){
+      console.log("Location fields on first asset:",result.locationDebug);
     }
-    toast("Loaded "+assets.length+" assets across "+rooms.length+" location"+(rooms.length!==1?"s":""));
+    btn.innerHTML='<div class="spin"></div> Grouping '+assets.length+' assets…';
+    rooms=groupByLocation(assets, result.locationDebug);
+    const noLoc=rooms.find(r=>r.name.startsWith("No location"));
+    const locCount=rooms.filter(r=>!r.name.startsWith("No location")).length;
+    let msg="Loaded "+assets.length+" assets";
+    if(locCount>0) msg+=" across "+locCount+" location"+(locCount!==1?"s":"");
+    if(noLoc) msg+=" ("+noLoc.assets.length+" unassigned)";
+    toast(msg, 4000);
     goRooms();
   }catch(e){
     toast("Failed: "+e.message,7000);
@@ -325,16 +330,35 @@ async function connectFS(){
   }
 }
 
-function groupByLocation(assets){
+function extractLocation(a, debug){
+  // Try every known field Freshservice uses for location
+  if(a.location_name && typeof a.location_name==="string") return a.location_name;
+  if(a.location){
+    if(typeof a.location==="string") return a.location;
+    if(a.location.name) return a.location.name;
+  }
+  // type_fields contains custom/asset-type-specific fields
+  if(a.type_fields){
+    const tf=a.type_fields;
+    // Common field names Freshservice uses
+    const keys=["location","location_name","location_id","room","department","site","building","floor"];
+    for(const k of keys){
+      if(tf[k] && typeof tf[k]==="string") return tf[k];
+    }
+    // Also check any key with "loc" in the name
+    for(const k of Object.keys(tf)){
+      if(k.toLowerCase().includes("loc") && tf[k] && typeof tf[k]==="string") return tf[k];
+    }
+  }
+  if(a.department_name) return a.department_name;
+  if(a.site_name) return a.site_name;
+  return "No location set";
+}
+
+function groupByLocation(assets, debug){
   const map={};
   assets.forEach(a=>{
-    // Freshservice can store location in several places
-    const loc =
-      a.location_name ||
-      (a.location && typeof a.location==="string" ? a.location : null) ||
-      (a.location && a.location.name ? a.location.name : null) ||
-      (a.type_fields && a.type_fields.location_id ? "Location #"+a.type_fields.location_id : null) ||
-      "⚠ No location set";
+    const loc=extractLocation(a, debug);
     if(!map[loc])map[loc]={name:loc,id:"loc_"+encodeURIComponent(loc),assets:[]};
     map[loc].assets.push({
       id:   a.id,
@@ -342,9 +366,8 @@ function groupByLocation(assets){
     });
   });
   return Object.values(map).sort((a,b)=>{
-    // Put "no location" at the bottom
-    if(a.name.startsWith("⚠"))return 1;
-    if(b.name.startsWith("⚠"))return -1;
+    if(a.name==="No location set") return 1;
+    if(b.name==="No location set") return -1;
     return a.name.localeCompare(b.name);
   });
 }
