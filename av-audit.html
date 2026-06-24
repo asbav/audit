@@ -2,633 +2,416 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="AV Audit"/>
 <meta name="theme-color" content="#ffffff"/>
 <title>AV Audit</title>
 <style>
-:root{
-  --bg:#ffffff;--bg2:#f5f5f5;--bg3:#efefef;
-  --text:#111111;--text2:#666666;--text3:#999999;
-  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
-  --green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;
-  --amber:#EF9F27;--amber-bg:#FAEEDA;--amber-text:#854F0B;
-  --red-bg:#FAECE7;--red-text:#993C1D;
-  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;
-  --purple-bg:#EEEDFE;--purple-text:#534AB7;
-  --radius:12px;--radius-sm:8px;
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#1a1a1a;--bg2:#252525;--bg3:#2e2e2e;
-    --text:#f0f0f0;--text2:#aaaaaa;--text3:#666666;
-    --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
-    --green-bg:#04342C;--green-text:#5DCAA5;
-    --amber-bg:#412402;--amber-text:#FAC775;
-    --red-bg:#4A1B0C;--red-text:#F0997B;
-    --blue-bg:#042C53;--blue-text:#85B7EB;
-    --purple-bg:#26215C;--purple-text:#AFA9EC;
-  }
-}
+:root{--bg:#fff;--bg2:#f5f5f5;--bg3:#efefef;--text:#111;--text2:#666;--text3:#999;--border:rgba(0,0,0,.12);--border2:rgba(0,0,0,.22);--green:#1D9E75;--gbg:#E1F5EE;--gtx:#0F6E56;--amber:#EF9F27;--abg:#FAEEDA;--atx:#854F0B;--rbg:#FAECE7;--rtx:#993C1D;--blue:#378ADD;--bbg:#E6F1FB;--btx:#185FA5;--pbg:#EEEDFE;--ptx:#534AB7;--r:12px;--rs:8px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#252525;--bg3:#2e2e2e;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.2);--gbg:#04342C;--gtx:#5DCAA5;--abg:#412402;--atx:#FAC775;--rbg:#4A1B0C;--rtx:#F0997B;--bbg:#042C53;--btx:#85B7EB;--pbg:#26215C;--ptx:#AFA9EC}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;background:var(--bg);color:var(--text)}
 #app{height:100%;display:flex;flex-direction:column;overflow:hidden}
 .screen{display:none;flex-direction:column;height:100%;overflow:hidden}
 .screen.active{display:flex}
-.scroll-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem;padding-bottom:calc(1rem + var(--safe-bottom))}
-.hdr{display:flex;align-items:center;gap:10px;padding:calc(12px + var(--safe-top)) 1rem 12px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0}
+.sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem;padding-bottom:calc(1rem + var(--sb))}
+.hdr{display:flex;align-items:center;gap:10px;padding:calc(12px + var(--st)) 1rem 12px;background:var(--bg);border-bottom:.5px solid var(--border);flex-shrink:0}
 .hdr h2{font-size:17px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-btn{background:none;border:none;cursor:pointer;color:var(--text2);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);flex-shrink:0;font-size:20px}
-.icon-btn:active{background:var(--bg2)}
-.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:10px}
-.card-list{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
-.badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600;white-space:nowrap;flex-shrink:0}
-.b-ok{background:var(--green-bg);color:var(--green-text)}
-.b-warn{background:var(--red-bg);color:var(--red-text)}
-.b-none{background:var(--bg2);color:var(--text2)}
-.sec-lbl{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin:1.25rem 0 0.5rem;padding:0 2px}
+.ib{background:none;border:none;cursor:pointer;color:var(--text2);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);flex-shrink:0;font-size:20px}
+.ib:active{background:var(--bg2)}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:10px}
+.cl{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.bdg{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.bok{background:var(--gbg);color:var(--gtx)}.bw{background:var(--rbg);color:var(--rtx)}.bn{background:var(--bg2);color:var(--text2)}
+.sl{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin:1.25rem 0 .5rem}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
-.stat{background:var(--bg2);border-radius:var(--radius-sm);padding:12px;text-align:center}
-.stat-n{font-size:26px;font-weight:700}
-.stat-l{font-size:11px;color:var(--text2);margin-top:2px}
-.room-row{display:flex;align-items:center;gap:12px;padding:12px 1rem;border-bottom:0.5px solid var(--border);cursor:pointer;background:var(--bg)}
-.room-row:last-child{border-bottom:none}
-.room-row:active{background:var(--bg2)}
-.room-icon{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
-.room-info{flex:1;min-width:0}
-.room-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.room-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.pbar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
-.pfill{height:100%;border-radius:2px;transition:width 0.3s}
-.asset-block{border-bottom:0.5px solid var(--border);overflow:hidden}
-.asset-block:last-child{border-bottom:none}
-.asset-hdr{display:flex;align-items:center;gap:10px;padding:12px 1rem;cursor:pointer;background:var(--bg)}
-.asset-hdr:active{background:var(--bg2)}
-.asset-name{font-size:15px;font-weight:600;flex:1}
-.asset-body{padding:0 1rem 12px;background:var(--bg)}
-.check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
-.check-row:last-child{border-bottom:none}
-.check-lbl{flex:1;font-size:14px;line-height:1.4}
-.check-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.chk-grp{display:flex;gap:6px;flex-shrink:0;margin-top:2px}
-.cb{width:38px;height:38px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2)}
-.cb.ok{background:var(--green-bg);border-color:var(--green);color:var(--green-text)}
-.cb.flag{background:var(--red-bg);border-color:#D85A30;color:var(--red-text)}
+.stat{background:var(--bg2);border-radius:var(--rs);padding:12px;text-align:center}
+.sn{font-size:26px;font-weight:700}.sl2{font-size:11px;color:var(--text2);margin-top:2px}
+.rr{display:flex;align-items:center;gap:12px;padding:12px 1rem;border-bottom:.5px solid var(--border);cursor:pointer}
+.rr:last-child{border-bottom:none}.rr:active{background:var(--bg2)}
+.ri{width:38px;height:38px;border-radius:var(--rs);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+.rn{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs2{font-size:12px;color:var(--text2);margin-top:2px}
+.pb{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
+.pf{height:100%;border-radius:2px;transition:width .3s}
+.ah{display:flex;align-items:center;gap:10px;padding:12px 1rem;cursor:pointer}
+.ah:active{background:var(--bg2)}
+.an{font-size:15px;font-weight:600;flex:1}
+.ab{padding:0 1rem 12px}
+.cr{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.cr:last-child{border-bottom:none}
+.cl2{flex:1;font-size:14px;line-height:1.4}
+.cs{font-size:12px;color:var(--text2);margin-top:2px}
+.cg{display:flex;gap:6px;flex-shrink:0;margin-top:2px}
+.cb{width:38px;height:38px;border-radius:var(--rs);border:1px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2)}
+.cb.ok{background:var(--gbg);border-color:var(--green);color:var(--gtx)}
+.cb.flag{background:var(--rbg);border-color:#D85A30;color:var(--rtx)}
 .cb.na{background:var(--bg2);border-color:var(--border);color:var(--text3)}
-.cb:active{opacity:0.6}
+.cb:active{opacity:.6}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
-.d-ok{background:var(--green)}.d-warn{background:var(--amber)}.d-none{background:var(--border2)}
-textarea,input,select{font-family:inherit;font-size:14px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);width:100%}
+.dok{background:var(--green)}.dw{background:var(--amber)}.dn{background:var(--border2)}
+textarea,input,select{font-family:inherit;font-size:14px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);width:100%}
 textarea{padding:8px 10px;resize:none;line-height:1.5;margin-top:8px}
-input{padding:10px 12px;height:44px}
-select{padding:10px 12px;height:44px}
+input{padding:10px 12px;height:44px}select{padding:10px 12px;height:44px}
 textarea:focus,input:focus,select:focus{outline:none;border-color:var(--blue)}
-.asset-comment{border-left:3px solid var(--blue);border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-top:12px}
-.btn-primary{width:100%;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
-.btn-primary:active{opacity:0.8}
-.btn-primary:disabled{opacity:0.35;cursor:not-allowed}
-.btn-secondary{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:var(--radius);font-size:15px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
-.btn-secondary:active{background:var(--bg2)}
-.fg{margin-bottom:12px}
-.fg label{font-size:13px;color:var(--text2);display:block;margin-bottom:4px;font-weight:500}
-.task-card{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
-.task-card:last-child{border-bottom:none}
-.task-chk{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;background:none;font-size:14px}
-.task-chk.on{background:var(--green-bg);border-color:var(--green);color:var(--green-text)}
-.task-info{flex:1;min-width:0}
-.task-title{font-size:14px;font-weight:600}
-.task-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.task-type{font-size:11px;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:4px;font-weight:500}
-.tt-flag{background:var(--red-bg);color:var(--red-text)}
-.tt-cable{background:var(--amber-bg);color:var(--amber-text)}
-.tt-tag{background:var(--blue-bg);color:var(--blue-text)}
-.tt-upgrade{background:var(--purple-bg);color:var(--purple-text)}
-.tt-other{background:var(--bg2);color:var(--text2)}
-.ct-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
-.ct-row input{flex:1;height:40px}
-.ct-row select{width:110px;height:40px;font-size:12px}
-.rm-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:4px;flex-shrink:0;line-height:1}
-.info-box{background:var(--green-bg);color:var(--green-text);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;line-height:1.6;margin-bottom:14px}
-.log-line{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;line-height:1.4}
-.log-line:last-child{border-bottom:none}
-.log-ok{color:var(--green)}.log-err{color:var(--red-text)}.log-spin{color:var(--blue)}
-#toast{position:fixed;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap;z-index:999;max-width:90vw;text-align:center}
+.ac{border-left:3px solid var(--blue);border-radius:0 var(--rs) var(--rs) 0;margin-top:12px}
+.bp{width:100%;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--r);font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px}
+.bp:active{opacity:.8}.bp:disabled{opacity:.35;cursor:not-allowed}
+.bs{width:100%;padding:12px;background:none;border:1px solid var(--border2);border-radius:var(--r);font-size:15px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.bs:active{background:var(--bg2)}
+.fg{margin-bottom:12px}.fg label{font-size:13px;color:var(--text2);display:block;margin-bottom:4px;font-weight:500}
+.tc{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.tc:last-child{border-bottom:none}
+.tk{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--border2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;background:none;font-size:14px}
+.tk.on{background:var(--gbg);border-color:var(--green);color:var(--gtx)}
+.ti{flex:1;min-width:0}.tt2{font-size:14px;font-weight:600}.ts2{font-size:12px;color:var(--text2);margin-top:2px}
+.typ{font-size:11px;padding:2px 7px;border-radius:20px;display:inline-block;margin-top:4px;font-weight:500}
+.tf{background:var(--rbg);color:var(--rtx)}.tca{background:var(--abg);color:var(--atx)}.tt3{background:var(--bbg);color:var(--btx)}.tu{background:var(--pbg);color:var(--ptx)}.to{background:var(--bg2);color:var(--text2)}
+.ctr{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.ctr input{flex:1;height:40px}.ctr select{width:110px;height:40px;font-size:12px}
+.rb2{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:4px;flex-shrink:0;line-height:1}
+.ib2{border-radius:var(--rs);padding:10px 12px;font-size:13px;line-height:1.6;margin-bottom:14px;background:var(--bbg);color:var(--btx)}
+.ll{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:.5px solid var(--border);font-size:13px;line-height:1.4}
+.ll:last-child{border-bottom:none}
+.lok{color:var(--green)}.ler{color:var(--rtx)}.lin{color:var(--blue)}
+#toast{position:fixed;bottom:calc(24px + var(--sb));left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:999;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
-.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:rot 0.6s linear infinite;flex-shrink:0}
+.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
 @keyframes rot{to{transform:rotate(360deg)}}
-.div{height:0.5px;background:var(--border);margin:14px 0}
-.hero{text-align:center;padding:2rem 0 1.5rem}
-.hero-icon{font-size:52px;margin-bottom:12px}
-.hero h1{font-size:24px;font-weight:700;margin-bottom:6px}
-.hero p{font-size:14px;color:var(--text2);line-height:1.6}
+.dv{height:.5px;background:var(--border);margin:14px 0}
+.hero{text-align:center;padding:1.5rem 0 1rem}
+.hero-icon{font-size:48px;margin-bottom:10px}
+.hero h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.hero p{font-size:13px;color:var(--text2);line-height:1.6}
+#prog{font-size:13px;color:var(--text2);text-align:center;margin-top:8px;min-height:20px}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- SETUP -->
 <div id="s-setup" class="screen active">
-  <div class="scroll-body">
-    <div class="hero">
-      <div class="hero-icon">📺</div>
-      <h1>AV Audit</h1>
-      <p>Classroom AV inventory tool<br>for school walk-around audits</p>
-    </div>
-    <div class="info-box">
-      ✓ No Anthropic key needed — requests go through a secure proxy built into this app.
-    </div>
-    <div class="fg"><label>Freshservice domain</label><input id="fs-domain" type="text" placeholder="yourschool.freshservice.com" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
-    <div class="fg"><label>API key</label><input id="fs-key" type="password" placeholder="Paste your Freshservice API key"/></div>
-    <div class="fg"><label>Ticket assignee group <span style="color:var(--text3);font-weight:400">(optional)</span></label><input id="fs-group" type="text" placeholder="e.g. IT Support"/></div>
-    <button class="btn-primary" onclick="connectFS()" id="connect-btn">Connect &amp; load rooms</button>
-    <button class="btn-secondary" onclick="loadDemo()">Preview with demo data</button>
-    <button class="btn-secondary" onclick="runDiagnostic()" id="diag-btn" style="border-color:var(--amber);color:var(--amber-text)">🔍 Run connection diagnostic</button>
-    <div id="diag-result" style="display:none;margin-top:12px;background:var(--bg2);border-radius:var(--radius-sm);padding:12px;font-size:12px;font-family:monospace;line-height:1.7;word-break:break-all;white-space:pre-wrap"></div>
-    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;line-height:1.6">Credentials are saved in this browser only<br>and never sent anywhere except Freshservice.</p>
+  <div class="sb">
+    <div class="hero"><div class="hero-icon">📺</div><h1>AV Audit</h1><p>Classroom AV inventory tool<br>for school walk-around audits</p></div>
+    <div class="ib2">ℹ️ Calls go through a lightweight Vercel proxy — no Anthropic key needed.</div>
+    <div class="fg"><label>Freshservice domain</label><input id="fsd" type="text" placeholder="yourschool.freshservice.com" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="fg"><label>Freshservice API key</label><input id="fsk" type="password" placeholder="Paste your API key"/></div>
+    <div class="fg"><label>Ticket group <span style="color:var(--text3);font-weight:400">(optional)</span></label><input id="grp" type="text" placeholder="e.g. IT Support"/></div>
+    <button class="bp" onclick="connect()" id="con-btn">Connect &amp; load rooms</button>
+    <div id="prog"></div>
+    <button class="bs" onclick="demo()">Preview with demo data</button>
+    <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;line-height:1.6">Credentials saved in this browser only.</p>
   </div>
 </div>
 
-<!-- ROOMS -->
 <div id="s-rooms" class="screen">
-  <div class="hdr">
-    <span style="font-size:20px">🏫</span>
-    <h2 id="rooms-title">Classrooms</h2>
-    <button class="icon-btn" onclick="showScreen('s-setup')" title="Settings">⚙️</button>
-  </div>
-  <div class="scroll-body">
-    <div class="stats">
-      <div class="stat"><div class="stat-n" id="st-rooms">0</div><div class="stat-l">rooms</div></div>
-      <div class="stat"><div class="stat-n" id="st-flags">0</div><div class="stat-l">flagged items</div></div>
-    </div>
-    <div class="card-list" id="room-list"></div>
-    <button class="btn-secondary" id="export-btn" onclick="exportCSV()" style="display:none;margin-top:12px">📥 Export full audit CSV</button>
+  <div class="hdr"><span style="font-size:20px">🏫</span><h2>Classrooms</h2><button class="ib" onclick="go('s-setup')">⚙️</button></div>
+  <div class="sb">
+    <div class="stats"><div class="stat"><div class="sn" id="st-r">0</div><div class="sl2">rooms</div></div><div class="stat"><div class="sn" id="st-f">0</div><div class="sl2">flagged</div></div></div>
+    <div class="cl" id="room-list"></div>
+    <button class="bs" id="exp-btn" onclick="exportCSV()" style="display:none;margin-top:12px">📥 Export audit CSV</button>
   </div>
 </div>
 
-<!-- ROOM DETAIL -->
 <div id="s-room" class="screen">
-  <div class="hdr">
-    <button class="icon-btn" onclick="goRooms()">←</button>
-    <h2 id="room-title">Room</h2>
-    <span id="room-badge" class="badge b-none">0%</span>
-  </div>
-  <div class="scroll-body" id="room-scroll">
-    <div id="room-body"></div>
-    <div class="sec-lbl">Tasks to create in Freshservice</div>
+  <div class="hdr"><button class="ib" onclick="goRooms()">←</button><h2 id="rt">Room</h2><span id="rb" class="bdg bn">0%</span></div>
+  <div class="sb" id="rscroll">
+    <div id="rbody"></div>
+    <div class="sl">Tasks to create in Freshservice</div>
     <div class="card">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Flagged checks auto-generate tickets. Add extra room tasks below.</p>
-      <div id="task-list"></div>
-      <div class="div"></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Flagged checks auto-generate tickets. Add extra tasks below.</p>
+      <div id="tlist"></div>
+      <div class="dv"></div>
       <p style="font-size:13px;font-weight:600;margin-bottom:8px">Add room-level task</p>
-      <div id="custom-tasks"></div>
-      <button class="btn-secondary" onclick="addCustomTask()" style="margin-top:4px">+ Add task</button>
+      <div id="ctasks"></div>
+      <button class="bs" onclick="addTask()" style="margin-top:4px">+ Add task</button>
     </div>
-    <button class="btn-primary" id="save-btn" onclick="saveRoom()">☁️ Save to Freshservice</button>
+    <button class="bp" onclick="saveRoom()">☁️ Save to Freshservice</button>
     <div style="height:1rem"></div>
   </div>
 </div>
 
-<!-- SAVING -->
 <div id="s-saving" class="screen">
-  <div class="hdr"><h2>Saving…</h2></div>
-  <div class="scroll-body">
-    <div class="card">
-      <p style="font-size:15px;font-weight:600;margin-bottom:12px" id="save-label"></p>
-      <div id="save-log"></div>
-    </div>
-    <button class="btn-primary" id="done-btn" onclick="goRooms()" style="display:none">← Back to rooms</button>
+  <div class="hdr"><h2 id="savtitle">Saving…</h2></div>
+  <div class="sb">
+    <div class="card"><p style="font-size:15px;font-weight:600;margin-bottom:12px" id="savlbl"></p><div id="savlog"></div></div>
+    <button class="bp" id="done-btn" onclick="goRooms()" style="display:none">← Back to rooms</button>
   </div>
 </div>
 
 </div>
 <div id="toast"></div>
-
 <script>
+const HW_TYPE = 27002724114;
+
 const CHECKS=[
-  {id:"disp_type",  label:"Display type recorded",         sub:"TV / projector / LED — confirm model",  opts:["ok","flag"]},
-  {id:"disp_mount", label:"Mount secure & stable",          sub:"Wall / trolley / wooden box",           opts:["ok","flag"]},
-  {id:"disp_clean", label:"Screen clean, no damage",        sub:"Cracks, burn-in, dead pixels",          opts:["ok","flag"]},
-  {id:"disp_tag",   label:"Asset tag present & legible",    sub:"FS sticker on device body",             opts:["ok","flag"]},
-  {id:"conn_hdmi",  label:"HDMI cable present & working",   sub:"Test signal end-to-end",                opts:["ok","flag","na"]},
-  {id:"conn_conv",  label:"HDMI adaptor/convertor in place",sub:"Type-C or other convertor",             opts:["ok","flag","na"]},
-  {id:"conn_atv",   label:"Apple TV powered & connected",   sub:"Firmware & remote battery OK",          opts:["ok","flag","na"]},
-  {id:"conn_remote",label:"Remote labelled & stored",       sub:"Sticker with room/device name",         opts:["ok","flag","na"]},
-  {id:"conn_dongle",label:"Dongle tagged & secured",        sub:"Labelled, not loose",                   opts:["ok","flag","na"]},
-  {id:"aud_works",  label:"Audio output working",           sub:"Built-in / Telome / external",          opts:["ok","flag"]},
-  {id:"aud_cable",  label:"Speaker cables managed",         sub:"No exposed or trailing wires",          opts:["ok","flag","na"]},
-  {id:"gen_cables", label:"Cable management tidy",          sub:"Velcro, trays, or ducting",             opts:["ok","flag"]},
-  {id:"gen_labels", label:"All cables labelled at both ends",sub:"HDMI source/dest tags",               opts:["ok","flag"]},
-  {id:"gen_access", label:"Teacher can operate independently",sub:"No workarounds needed",              opts:["ok","flag"]},
+  {id:"disp_type",  l:"Display type recorded",           s:"TV / projector / LED — confirm model", o:["ok","flag"]},
+  {id:"disp_mount", l:"Mount secure & stable",            s:"Wall / trolley / wooden box",          o:["ok","flag"]},
+  {id:"disp_clean", l:"Screen clean, no damage",          s:"Cracks, burn-in, dead pixels",         o:["ok","flag"]},
+  {id:"disp_tag",   l:"Asset tag present & legible",      s:"FS sticker on device body",            o:["ok","flag"]},
+  {id:"conn_hdmi",  l:"HDMI cable present & working",     s:"Test signal end-to-end",               o:["ok","flag","na"]},
+  {id:"conn_conv",  l:"HDMI adaptor/convertor in place",  s:"Type-C or other convertor",            o:["ok","flag","na"]},
+  {id:"conn_atv",   l:"Apple TV powered & connected",     s:"Firmware & remote battery OK",         o:["ok","flag","na"]},
+  {id:"conn_remote",l:"Remote labelled & stored",         s:"Sticker with room/device name",        o:["ok","flag","na"]},
+  {id:"conn_dongle",l:"Dongle tagged & secured",          s:"Labelled, not loose",                  o:["ok","flag","na"]},
+  {id:"aud_works",  l:"Audio output working",             s:"Built-in / Telome / external",         o:["ok","flag"]},
+  {id:"aud_cable",  l:"Speaker cables managed",           s:"No exposed or trailing wires",         o:["ok","flag","na"]},
+  {id:"gen_cables", l:"Cable management tidy",            s:"Velcro, trays, or ducting",            o:["ok","flag"]},
+  {id:"gen_labels", l:"All cables labelled at both ends", s:"HDMI source/dest tags",                o:["ok","flag"]},
+  {id:"gen_access", l:"Teacher can operate independently",s:"No workarounds needed",               o:["ok","flag"]},
 ];
-const TTYPES=[
-  {value:"flag",    label:"Flagged issue",      cls:"tt-flag"},
-  {value:"cable",   label:"Cable management",   cls:"tt-cable"},
-  {value:"tag",     label:"Print tags/stickers",cls:"tt-tag"},
-  {value:"upgrade", label:"Upgrade / replace",  cls:"tt-upgrade"},
-  {value:"other",   label:"Other",              cls:"tt-other"},
+const TT=[
+  {v:"flag",   l:"Flagged issue",      c:"tf"},
+  {v:"cable",  l:"Cable management",   c:"tca"},
+  {v:"tag",    l:"Print tags/stickers",c:"tt3"},
+  {v:"upgrade",l:"Upgrade / replace",  c:"tu"},
+  {v:"other",  l:"Other",              c:"to"},
 ];
 
-let cfg={domain:"",key:"",group:""};
-let rooms=[], audit={}, currentRoom=null;
-let customTasks={}, expanded={}, autoSel={};
+let cfg={d:"",k:"",g:""};
+let rooms=[],audit={},cur=null,cTasks={},expd={},aSel={};
 
-function saveConfig(){try{localStorage.setItem("av_cfg2",JSON.stringify(cfg));}catch(e){}}
-function loadConfig(){
-  try{
-    const c=JSON.parse(localStorage.getItem("av_cfg2")||"{}");
-    if(c.domain){cfg=c;}
-    if(cfg.domain)document.getElementById("fs-domain").value=cfg.domain;
-    if(cfg.key)   document.getElementById("fs-key").value=cfg.key;
-    if(cfg.group) document.getElementById("fs-group").value=cfg.group;
-  }catch(e){}
-}
+function saveCfg(){try{localStorage.setItem("avcfg6",JSON.stringify({d:cfg.d,g:cfg.g}));}catch(e){}}
+function loadCfg(){try{const c=JSON.parse(localStorage.getItem("avcfg6")||"{}");if(c.d)document.getElementById("fsd").value=c.d;if(c.g)document.getElementById("grp").value=c.g;}catch(e){}}
 
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  window.scrollTo(0,0);
-}
-function toast(msg,dur=3000){
-  const t=document.getElementById("toast");
-  t.textContent=msg;t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),dur);
-}
+function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);}
+function toast(m,d=3500){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),d);}
+function prog(m){document.getElementById("prog").textContent=m;}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
-// Calls our Vercel serverless proxy -- no CORS, no Anthropic key
-async function fsCall(method, path, body, action){
-  const res = await fetch("/api/proxy?path="+encodeURIComponent(path), {
+// Single proxy call — fast, well under Vercel's 10s limit
+async function fs(method, path, body){
+  const url = "/api/fs?path=" + encodeURIComponent(path);
+  const res = await fetch(url, {
     method,
-    headers:{
-      "Content-Type":  "application/json",
-      "x-fs-domain":   cfg.domain,
-      "x-fs-key":      cfg.key,
-      "x-fs-action":   action||"passthrough",
-    },
+    headers:{"Content-Type":"application/json","x-fs-domain":cfg.d,"x-fs-key":cfg.k},
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json();
-  return { status: res.status, body: data };
+  if(!res.ok) throw new Error("FS error "+res.status+": "+(data.error||JSON.stringify(data).slice(0,100)));
+  return data;
 }
 
-function getAudit(rid){if(!audit[rid])audit[rid]={assets:{}};return audit[rid];}
-function getAsset(rid,aid){
-  const a=getAudit(rid); const k=String(aid);
-  if(!a.assets[k])a.assets[k]={checks:{},notes:{},comment:""};
-  return a.assets[k];
-}
-
-function roomProgress(rid){
-  const r=rooms.find(x=>x.id===rid);
-  if(!r)return{total:0,done:0,flags:0,pct:0};
-  let done=0,flags=0;
-  const total=r.assets.length*CHECKS.length;
-  r.assets.forEach(a=>{
-    const as=getAsset(rid,a.id);
-    CHECKS.forEach(c=>{if(as.checks[c.id]){done++;if(as.checks[c.id]==="flag")flags++;}});
-  });
-  return{total,done,flags,pct:total?Math.round(done/total*100):0};
-}
-
-async function connectFS(){
-  const domain=document.getElementById("fs-domain").value.trim();
-  const key   =document.getElementById("fs-key").value.trim();
-  if(!domain||!key){toast("Enter your Freshservice domain and API key");return;}
-  cfg={domain,key,group:document.getElementById("fs-group").value.trim()};
-  saveConfig();
-  const btn=document.getElementById("connect-btn");
-  btn.innerHTML='<div class="spin"></div> Loading assets…';btn.disabled=true;
-  try{
-    // Proxy handles full pagination — just one call needed
-    const result=await fsCall("GET","/api/v2/assets",null,"fetch-all-assets");
-    if(result.error)throw new Error(result.error+(result.detail?" Details: "+result.detail:""));
-    const assets=result.assets||result.items||[];
-    if(!assets.length){
-      toast("No assets returned. Check API key permissions in Freshservice.",6000);
-      console.warn("Raw response:",result);
-      return;
-    }
-    // Log location fields from first asset so we can see what FS returns
-    if(result.locationDebug){
-      console.log("Location fields on first asset:",result.locationDebug);
-    }
-    btn.innerHTML='<div class="spin"></div> Grouping '+assets.length+' assets…';
-    rooms=groupByLocation(assets);
-    const noLoc=rooms.find(r=>r.name==="No location set");
-    const locRooms=rooms.filter(r=>r.name!=="No location set");
-    let msg="Loaded "+assets.length+" hardware assets across "+locRooms.length+" location"+(locRooms.length!==1?"s":"");
-    if(noLoc) msg+=" ("+noLoc.assets.length+" unassigned)";
-    toast(msg, 4000);
-    if(result.locations_loaded) console.log("Locations loaded:",result.locations_loaded);
-    goRooms();
-  }catch(e){
-    toast("Failed: "+e.message,7000);
-    console.error(e);
-  }finally{
-    btn.innerHTML="Connect &amp; load rooms";btn.disabled=false;
+async function fetchLocs(){
+  const map={};let page=1;
+  while(page<=10){
+    prog("Loading locations… (page "+page+")");
+    const d=await fs("GET","/api/v2/locations?per_page=100&page="+page);
+    const ls=d.locations||[];
+    ls.forEach(l=>{map[l.id]=l.name;});
+    if(ls.length<100)break;
+    page++;
   }
+  return map;
 }
 
-function groupByLocation(assets){
-  // location_name is pre-resolved by the proxy from location_id
+async function fetchAssets(lmap){
+  let all=[],page=1;
+  while(page<=30){
+    prog("Loading hardware assets… page "+page+" ("+all.length+" so far)");
+    const d=await fs("GET","/api/v2/assets?asset_type_id="+HW_TYPE+"&per_page=100&page="+page);
+    const pa=d.assets||[];
+    pa.forEach(a=>{all.push({
+      id:a.id,
+      name:a.name||a.display_name||a.asset_tag||"Asset "+a.id,
+      loc:a.location_id?(lmap[a.location_id]||"Location #"+a.location_id):"No location set"
+    });});
+    if(pa.length<100)break;
+    page++;
+  }
+  return all;
+}
+
+async function connect(){
+  const d=document.getElementById("fsd").value.trim();
+  const k=document.getElementById("fsk").value.trim();
+  if(!d||!k){toast("Enter your Freshservice domain and API key");return;}
+  cfg={d,k,g:document.getElementById("grp").value.trim()};
+  saveCfg();
+  const btn=document.getElementById("con-btn");
+  btn.innerHTML='<div class="spin"></div> Loading…';btn.disabled=true;prog("");
+  try{
+    const lmap=await fetchLocs();
+    prog(Object.keys(lmap).length+" locations loaded. Fetching hardware assets…");
+    const assets=await fetchAssets(lmap);
+    rooms=groupBy(assets);
+    const lr=rooms.filter(r=>r.name!=="No location set");
+    const nl=rooms.find(r=>r.name==="No location set");
+    let msg="Loaded "+assets.length+" assets across "+lr.length+" locations";
+    if(nl)msg+=" ("+nl.assets.length+" unassigned)";
+    toast(msg,5000);prog("");goRooms();
+  }catch(e){
+    toast("Error: "+e.message,8000);
+    prog("Failed — check your domain and API key.");
+    console.error(e);
+  }finally{btn.innerHTML="Connect &amp; load rooms";btn.disabled=false;}
+}
+
+function groupBy(assets){
   const map={};
   assets.forEach(a=>{
-    const loc = a.location_name || "No location set";
-    if(!map[loc])map[loc]={name:loc,id:"loc_"+encodeURIComponent(loc),assets:[]};
-    map[loc].assets.push({ id: a.id, name: a.name });
+    const l=a.loc||"No location set";
+    if(!map[l])map[l]={name:l,id:"l_"+encodeURIComponent(l),assets:[]};
+    map[l].assets.push({id:a.id,name:a.name});
   });
   return Object.values(map).sort((a,b)=>{
-    if(a.name==="No location set") return 1;
-    if(b.name==="No location set") return -1;
+    if(a.name==="No location set")return 1;if(b.name==="No location set")return -1;
     return a.name.localeCompare(b.name);
   });
 }
 
-function loadDemo(){
+function demo(){
   rooms=[
-    {id:"r101", name:"Room 101 — Science", assets:[{id:1001,name:'Samsung 75" TV'},{id:1002,name:"Apple TV 4K"},{id:1003,name:"HDMI-C adaptor"}]},
-    {id:"rhall",name:"Main Hall",          assets:[{id:2001,name:"Epson EB-X51 Projector"},{id:2002,name:"Telome speaker set"}]},
-    {id:"rlib", name:"Library",            assets:[{id:3001,name:'LG 65" TV (trolley)'},{id:3002,name:"Wireless dongle"}]},
-    {id:"r204", name:"Room 204 — Art",     assets:[{id:4001,name:'BenQ 70" Interactive'},{id:4002,name:"Built-in speaker bar"}]},
-    {id:"r305", name:"Room 305 — English", assets:[{id:5001,name:'Hisense 55" TV'},{id:5002,name:"Apple TV (gen 3)"},{id:5003,name:"HDMI cable x2"}]},
+    {id:"rG3",  name:"G3",          assets:[{id:1001,name:'Samsung 75" TV'},{id:1002,name:"Apple TV 4K"},{id:1003,name:"HDMI-C adaptor"}]},
+    {id:"rG4",  name:"G4",          assets:[{id:2001,name:'LG 65" TV (trolley)'},{id:2002,name:"TV Cart"}]},
+    {id:"rband",name:"Band Room",   assets:[{id:3001,name:"Epson Projector"},{id:3002,name:"Telome Speaker Set"}]},
+    {id:"rdrama",name:"Drama Studio",assets:[{id:4001,name:'BenQ 70" Interactive'},{id:4002,name:"Built-in speaker bar"}]},
+    {id:"r401", name:"401",         assets:[{id:5001,name:'Hisense 55" TV'},{id:5002,name:"Apple TV gen 3"},{id:5003,name:"TV Cart"}]},
   ];
-  cfg={domain:"",key:"",group:""};
-  goRooms();
+  cfg={d:"",k:"",g:""};goRooms();
 }
 
-function goRooms(){renderRooms();showScreen("s-rooms");}
+function goRooms(){renderRooms();go("s-rooms");}
 
 function renderRooms(){
-  let totalFlags=0;
+  let tf=0;
   document.getElementById("room-list").innerHTML=rooms.map(r=>{
-    const{pct,flags,done,total}=roomProgress(r.id);
-    totalFlags+=flags;
+    const{pct,flags,done,total}=rProg(r.id);tf+=flags;
     const col=flags>0?"var(--amber)":pct===100?"var(--green)":"var(--blue)";
-    const bdg=flags>0
-      ?`<span class="badge b-warn">${flags} flagged</span>`
-      :pct===100
-      ?`<span class="badge b-ok">Done ✓</span>`
-      :`<span class="badge b-none">${done}/${total}</span>`;
-    return`<div class="room-row" onclick="openRoom('${r.id}')">
-      <div class="room-icon">📺</div>
-      <div class="room-info">
-        <div class="room-name">${esc(r.name)}</div>
-        <div class="room-sub">${r.assets.length} asset${r.assets.length!==1?"s":""}</div>
-        <div class="pbar"><div class="pfill" style="width:${pct}%;background:${col}"></div></div>
-      </div>${bdg}
-    </div>`;
+    const b=flags>0?`<span class="bdg bw">${flags} flagged</span>`:pct===100?`<span class="bdg bok">Done ✓</span>`:`<span class="bdg bn">${done}/${total}</span>`;
+    return`<div class="rr" onclick="openRoom('${r.id}')"><div class="ri">📺</div><div style="flex:1;min-width:0"><div class="rn">${esc(r.name)}</div><div class="rs2">${r.assets.length} asset${r.assets.length!==1?"s":""}</div><div class="pb"><div class="pf" style="width:${pct}%;background:${col}"></div></div></div>${b}</div>`;
   }).join("");
-  document.getElementById("st-rooms").textContent=rooms.length;
-  document.getElementById("st-flags").textContent=totalFlags;
-  document.getElementById("export-btn").style.display=
-    rooms.every(r=>roomProgress(r.id).pct===100)?"flex":"none";
+  document.getElementById("st-r").textContent=rooms.length;
+  document.getElementById("st-f").textContent=tf;
+  document.getElementById("exp-btn").style.display=rooms.every(r=>rProg(r.id).pct===100)?"flex":"none";
+}
+
+function gA(rid){if(!audit[rid])audit[rid]={assets:{}};return audit[rid];}
+function gAs(rid,aid){const a=gA(rid);const k=String(aid);if(!a.assets[k])a.assets[k]={checks:{},notes:{},comment:""};return a.assets[k];}
+function rProg(rid){
+  const r=rooms.find(x=>x.id===rid);if(!r)return{total:0,done:0,flags:0,pct:0};
+  let done=0,flags=0;const total=r.assets.length*CHECKS.length;
+  r.assets.forEach(a=>{const as=gAs(rid,a.id);CHECKS.forEach(c=>{if(as.checks[c.id]){done++;if(as.checks[c.id]==="flag")flags++;}});});
+  return{total,done,flags,pct:total?Math.round(done/total*100):0};
 }
 
 function openRoom(id){
-  currentRoom=rooms.find(r=>r.id===id);
-  if(!customTasks[id])customTasks[id]=[];
-  if(!autoSel[id])autoSel[id]={};
-  document.getElementById("room-title").textContent=currentRoom.name;
-  renderRoomBody();renderTaskList();renderCustomTasks();
-  showScreen("s-room");
-  document.getElementById("room-scroll").scrollTop=0;
-  updateBadge();
+  cur=rooms.find(r=>r.id===id);
+  if(!cTasks[id])cTasks[id]=[];if(!aSel[id])aSel[id]={};
+  document.getElementById("rt").textContent=cur.name;
+  renderRoom();renderTasks();renderCTasks();go("s-room");
+  document.getElementById("rscroll").scrollTop=0;updBadge();
 }
 
-function updateBadge(){
-  const{pct,flags}=roomProgress(currentRoom.id);
-  const b=document.getElementById("room-badge");
-  if(flags>0){b.textContent=flags+" flagged";b.className="badge b-warn";}
-  else if(pct===100){b.textContent="Complete";b.className="badge b-ok";}
-  else{b.textContent=pct+"%";b.className="badge b-none";}
+function updBadge(){
+  const{pct,flags}=rProg(cur.id);const b=document.getElementById("rb");
+  if(flags>0){b.textContent=flags+" flagged";b.className="bdg bw";}
+  else if(pct===100){b.textContent="Complete";b.className="bdg bok";}
+  else{b.textContent=pct+"%";b.className="bdg bn";}
 }
 
-function renderRoomBody(){
-  const rid=currentRoom.id;
-  let html="";
-  currentRoom.assets.forEach(asset=>{
-    const as=getAsset(rid,asset.id);
-    const isOpen=!!expanded[rid+"_"+asset.id];
-    const flagCount=Object.values(as.checks).filter(v=>v==="flag").length;
-    const doneCount=Object.keys(as.checks).length;
-    const statusIcon=flagCount>0?"⚠️":doneCount===CHECKS.length?"✅":"⬜";
-    html+=`<div class="card-list">
-      <div class="asset-hdr" onclick="toggleAsset('${rid}','${asset.id}')">
-        <span style="font-size:18px;flex-shrink:0">${statusIcon}</span>
-        <span class="asset-name">${esc(asset.name)}</span>
-        <span style="font-size:13px;color:var(--text2)">${isOpen?"▲":"▼"}</span>
-      </div>`;
-    if(isOpen){
-      html+=`<div class="asset-body">`;
+function renderRoom(){
+  const rid=cur.id;let html="";
+  cur.assets.forEach(asset=>{
+    const as=gAs(rid,asset.id);const isO=!!expd[rid+"_"+asset.id];
+    const fc=Object.values(as.checks).filter(v=>v==="flag").length;
+    const dc=Object.keys(as.checks).length;
+    const ico=fc>0?"⚠️":dc===CHECKS.length?"✅":"⬜";
+    html+=`<div class="cl"><div class="ah" onclick="togA('${rid}','${asset.id}')"><span style="font-size:18px;flex-shrink:0">${ico}</span><span class="an">${esc(asset.name)}</span><span style="font-size:13px;color:var(--text2)">${isO?"▲":"▼"}</span></div>`;
+    if(isO){
+      html+=`<div class="ab">`;
       CHECKS.forEach(c=>{
-        const val=as.checks[c.id]||"";
-        const note=as.notes[c.id]||"";
-        html+=`<div class="check-row">
-          <div class="dot ${val==="ok"?"d-ok":val==="flag"?"d-warn":"d-none"}"></div>
-          <div style="flex:1;min-width:0">
-            <div class="check-lbl">${esc(c.label)}<div class="check-sub">${esc(c.sub)}</div></div>
-            ${val==="flag"?`<textarea rows="2" placeholder="Describe the issue…" oninput="setNote('${asset.id}','${c.id}',this.value)">${esc(note)}</textarea>`:""}
-          </div>
-          <div class="chk-grp">
-            <button class="cb ${val==="ok"?"ok":""}"  onclick="setCheck('${rid}','${asset.id}','${c.id}','ok')">✓</button>
-            <button class="cb ${val==="flag"?"flag":""}" onclick="setCheck('${rid}','${asset.id}','${c.id}','flag')">!</button>
-            ${c.opts.includes("na")?`<button class="cb ${val==="na"?"na":""}" onclick="setCheck('${rid}','${asset.id}','${c.id}','na')">—</button>`:""}
-          </div>
-        </div>`;
+        const val=as.checks[c.id]||"";const note=as.notes[c.id]||"";
+        html+=`<div class="cr"><div class="dot ${val==="ok"?"dok":val==="flag"?"dw":"dn"}"></div><div style="flex:1;min-width:0"><div class="cl2">${esc(c.l)}<div class="cs">${esc(c.s)}</div></div>${val==="flag"?`<textarea rows="2" placeholder="Describe the issue…" oninput="setNote('${asset.id}','${c.id}',this.value)">${esc(note)}</textarea>`:""}</div><div class="cg"><button class="cb ${val==="ok"?"ok":""}" onclick="setChk('${rid}','${asset.id}','${c.id}','ok')">✓</button><button class="cb ${val==="flag"?"flag":""}" onclick="setChk('${rid}','${asset.id}','${c.id}','flag')">!</button>${c.o.includes("na")?`<button class="cb ${val==="na"?"na":""}" onclick="setChk('${rid}','${asset.id}','${c.id}','na')">—</button>`:""}</div></div>`;
       });
-      html+=`<textarea class="asset-comment" rows="2" placeholder="General asset notes (saved to Freshservice description)…" oninput="setComment('${rid}','${asset.id}',this.value)">${esc(as.comment)}</textarea>`;
-      html+="</div>";
+      html+=`<textarea class="ac" rows="2" placeholder="Asset notes (saved to Freshservice description)…" oninput="setCmt('${rid}','${asset.id}',this.value)">${esc(as.comment)}</textarea></div>`;
     }
     html+="</div>";
   });
-  document.getElementById("room-body").innerHTML=html;
+  document.getElementById("rbody").innerHTML=html;
 }
 
-function toggleAsset(rid,aid){const k=rid+"_"+aid;expanded[k]=!expanded[k];renderRoomBody();}
-function setCheck(rid,aid,cid,val){
-  const as=getAsset(rid,aid);
-  as.checks[cid]=val;
-  if(val!=="flag")delete as.notes[cid];
-  renderRoomBody();renderTaskList();updateBadge();
-}
-function setNote(aid,cid,val){getAsset(currentRoom.id,aid).notes[cid]=val;renderTaskList();}
-function setComment(rid,aid,val){getAsset(rid,aid).comment=val;}
+function togA(rid,aid){const k=rid+"_"+aid;expd[k]=!expd[k];renderRoom();}
+function setChk(rid,aid,cid,val){const as=gAs(rid,aid);as.checks[cid]=val;if(val!=="flag")delete as.notes[cid];renderRoom();renderTasks();updBadge();}
+function setNote(aid,cid,val){gAs(cur.id,aid).notes[cid]=val;renderTasks();}
+function setCmt(rid,aid,val){gAs(rid,aid).comment=val;}
 
-function buildAutoTasks(){
-  const rid=currentRoom.id; const tasks=[];
-  currentRoom.assets.forEach(asset=>{
-    const as=getAsset(rid,asset.id);
-    CHECKS.forEach(c=>{
-      if(as.checks[c.id]==="flag"){
-        tasks.push({id:"auto_"+asset.id+"_"+c.id,type:"flag",title:c.label+" — "+asset.name,detail:as.notes[c.id]||""});
-      }
-    });
-  });
-  return tasks;
+function autoTasks(){
+  const rid=cur.id;const t=[];
+  cur.assets.forEach(asset=>{const as=gAs(rid,asset.id);CHECKS.forEach(c=>{if(as.checks[c.id]==="flag")t.push({id:"a_"+asset.id+"_"+c.id,type:"flag",title:c.l+" — "+asset.name,detail:as.notes[c.id]||""});});});
+  return t;
 }
 
-function renderTaskList(){
-  const tasks=buildAutoTasks();
-  tasks.forEach(t=>{if(autoSel[currentRoom.id][t.id]===undefined)autoSel[currentRoom.id][t.id]=true;});
+function renderTasks(){
+  const tasks=autoTasks();
+  tasks.forEach(t=>{if(aSel[cur.id][t.id]===undefined)aSel[cur.id][t.id]=true;});
   let html="";
-  if(!tasks.length){
-    html=`<p style="font-size:13px;color:var(--text2);padding:4px 0 8px">No flagged items yet — they appear here automatically when you flag a check above.</p>`;
-  }else{
-    tasks.forEach(t=>{
-      const sel=autoSel[currentRoom.id][t.id]!==false;
-      const tt=TTYPES.find(x=>x.value===t.type)||TTYPES[0];
-      html+=`<div class="task-card">
-        <button class="task-chk ${sel?"on":""}" onclick="toggleAutoTask('${t.id}')">${sel?"✓":""}</button>
-        <div class="task-info">
-          <div class="task-title">${esc(t.title)}</div>
-          ${t.detail?`<div class="task-sub">${esc(t.detail)}</div>`:""}
-          <span class="task-type ${tt.cls}">${tt.label}</span>
-        </div>
-      </div>`;
-    });
-  }
-  document.getElementById("task-list").innerHTML=html;
+  if(!tasks.length)html=`<p style="font-size:13px;color:var(--text2);padding:4px 0 8px">No flagged items yet — they appear automatically when you flag a check above.</p>`;
+  else tasks.forEach(t=>{
+    const sel=aSel[cur.id][t.id]!==false;const tt=TT.find(x=>x.v===t.type)||TT[0];
+    html+=`<div class="tc"><button class="tk ${sel?"on":""}" onclick="togT('${t.id}')">${sel?"✓":""}</button><div class="ti"><div class="tt2">${esc(t.title)}</div>${t.detail?`<div class="ts2">${esc(t.detail)}</div>`:""}<span class="typ ${tt.c}">${tt.l}</span></div></div>`;
+  });
+  document.getElementById("tlist").innerHTML=html;
 }
+function togT(id){aSel[cur.id][id]=!(aSel[cur.id][id]!==false);renderTasks();}
 
-function toggleAutoTask(id){
-  autoSel[currentRoom.id][id]=!(autoSel[currentRoom.id][id]!==false);
-  renderTaskList();
+function renderCTasks(){
+  const tasks=cTasks[cur.id]||[];
+  document.getElementById("ctasks").innerHTML=tasks.map((t,i)=>`<div class="ctr"><input type="text" value="${esc(t.title)}" placeholder="Task description…" oninput="updCT(${i},'title',this.value)"/><select onchange="updCT(${i},'type',this.value)">${TT.map(tt=>`<option value="${tt.v}" ${t.type===tt.v?"selected":""}>${tt.l}</option>`).join("")}</select><button class="rb2" onclick="rmCT(${i})">✕</button></div>`).join("");
 }
+function addTask(){cTasks[cur.id].push({title:"",type:"cable"});renderCTasks();}
+function updCT(i,f,v){cTasks[cur.id][i][f]=v;}
+function rmCT(i){cTasks[cur.id].splice(i,1);renderCTasks();}
 
-function renderCustomTasks(){
-  const tasks=customTasks[currentRoom.id]||[];
-  document.getElementById("custom-tasks").innerHTML=tasks.map((t,i)=>`
-    <div class="ct-row">
-      <input type="text" value="${esc(t.title)}" placeholder="Task description…" oninput="updateCT(${i},'title',this.value)"/>
-      <select onchange="updateCT(${i},'type',this.value)">
-        ${TTYPES.map(tt=>`<option value="${tt.value}" ${t.type===tt.value?"selected":""}>${tt.label}</option>`).join("")}
-      </select>
-      <button class="rm-btn" onclick="removeCT(${i})">✕</button>
-    </div>`).join("");
-}
-
-function addCustomTask(){customTasks[currentRoom.id].push({title:"",type:"cable"});renderCustomTasks();}
-function updateCT(i,f,v){customTasks[currentRoom.id][i][f]=v;}
-function removeCT(i){customTasks[currentRoom.id].splice(i,1);renderCustomTasks();}
-
-function logLine(id,icon,msg,cls){
-  const el=document.getElementById("save-log");
-  const existing=document.getElementById("ll_"+id);
-  const html=`<div id="ll_${id}" class="log-line"><span class="${cls}" style="flex-shrink:0;margin-top:1px">${icon}</span><span>${esc(msg)}</span></div>`;
-  if(existing)existing.outerHTML=html; else el.insertAdjacentHTML("beforeend",html);
+function logL(id,icon,msg,cls){
+  const el=document.getElementById("savlog");const ex=document.getElementById("ll_"+id);
+  const html=`<div id="ll_${id}" class="ll"><span class="${cls}" style="flex-shrink:0">${icon}</span><span>${esc(msg)}</span></div>`;
+  if(ex)ex.outerHTML=html;else el.insertAdjacentHTML("beforeend",html);
 }
 
 async function saveRoom(){
-  const rid=currentRoom.id;
-  const isDemo=!cfg.key;
+  const rid=cur.id;const isDemo=!cfg.k;
   const now=new Date().toISOString().slice(0,10);
-  const autoTasks=buildAutoTasks().filter(t=>autoSel[rid]&&autoSel[rid][t.id]!==false);
-  const custTasks=(customTasks[rid]||[]).filter(t=>t.title.trim());
-  const allTasks=[...autoTasks,...custTasks];
-
-  if(isDemo){
-    toast(`Demo: would update ${currentRoom.assets.length} assets & create ${allTasks.length} ticket${allTasks.length!==1?"s":""}`,4000);
-    return;
-  }
-
-  document.getElementById("save-label").textContent=currentRoom.name;
-  document.getElementById("save-log").innerHTML="";
+  const at=autoTasks().filter(t=>aSel[rid]&&aSel[rid][t.id]!==false);
+  const ct=(cTasks[rid]||[]).filter(t=>t.title.trim());
+  const all=[...at,...ct];
+  if(isDemo){toast("Demo: would update "+cur.assets.length+" assets & create "+all.length+" ticket"+(all.length!==1?"s":""),4000);return;}
+  document.getElementById("savlbl").textContent=cur.name;
+  document.getElementById("savlog").innerHTML="";
   document.getElementById("done-btn").style.display="none";
-  showScreen("s-saving");
-
-  for(const asset of currentRoom.assets){
-    const as=getAsset(rid,asset.id);
-    const flags=CHECKS.filter(c=>as.checks[c.id]==="flag")
-      .map(c=>`  • ${c.label}${as.notes[c.id]?": "+as.notes[c.id]:""}`).join("\n");
-    const oks=CHECKS.filter(c=>as.checks[c.id]==="ok")
-      .map(c=>`  • ${c.label}`).join("\n");
-    const desc=[
-      `AV Audit — ${now}`,
-      as.comment?"\n"+as.comment:"",
-      oks?"\n\n✓ OK:\n"+oks:"",
-      flags?"\n\n⚠ Flagged:\n"+flags:"",
-    ].join("").trim();
-
-    logLine("a"+asset.id,"⏳","Updating "+asset.name+"…","log-spin");
+  document.getElementById("savtitle").textContent="Saving…";
+  go("s-saving");
+  for(const asset of cur.assets){
+    const as=gAs(rid,asset.id);
+    const fl=CHECKS.filter(c=>as.checks[c.id]==="flag").map(c=>`  • ${c.l}${as.notes[c.id]?": "+as.notes[c.id]:""}`).join("\n");
+    const ok=CHECKS.filter(c=>as.checks[c.id]==="ok").map(c=>`  • ${c.l}`).join("\n");
+    const desc=[`AV Audit — ${now}`,as.comment?"\n\n"+as.comment:"",ok?"\n\n✓ OK:\n"+ok:"",fl?"\n\n⚠ Flagged:\n"+fl:""].join("").trim();
+    logL("a"+asset.id,"⏳","Updating "+asset.name+"…","lin");
     try{
-      const r=await fsCall("PUT","/api/v2/assets/"+asset.id,{asset:{description:desc,last_audit_date:now}});
-      if(r.status>=400)throw new Error("Status "+r.status);
-      logLine("a"+asset.id,"✅",asset.name+" updated","log-ok");
-    }catch(e){
-      logLine("a"+asset.id,"❌",asset.name+" — "+e.message,"log-err");
-    }
+      await fs("PUT","/api/v2/assets/"+asset.id,{asset:{description:desc,last_audit_date:now}});
+      logL("a"+asset.id,"✅",asset.name+" updated","lok");
+    }catch(e){logL("a"+asset.id,"❌",asset.name+": "+e.message,"ler");}
   }
-
-  for(const task of allTasks){
-    const tt=TTYPES.find(x=>x.value===task.type)||TTYPES[0];
-    logLine("t"+task.id,"⏳","Creating ticket: "+task.title.slice(0,50),"log-spin");
+  for(const task of all){
+    const tt=TT.find(x=>x.v===task.type)||TT[0];
+    logL("t"+task.id,"⏳","Ticket: "+task.title.slice(0,50),"lin");
     try{
-      const r=await fsCall("POST","/api/v2/tickets",{
-        subject:"[AV Audit] "+task.title,
-        description:`Room: ${currentRoom.name}\nType: ${tt.label}\n${task.detail||task.title}\n\nRaised by AV Audit on ${now}.`,
-        type:"Incident",
-        priority:2,
-        ...(cfg.group?{group_name:cfg.group}:{}),
-      });
-      if(r.status>=400)throw new Error("Status "+r.status);
-      logLine("t"+task.id,"✅","Ticket created: "+task.title.slice(0,50),"log-ok");
-    }catch(e){
-      logLine("t"+task.id,"❌","Ticket failed: "+e.message,"log-err");
-    }
+      await fs("POST","/api/v2/tickets",{subject:"[AV Audit] "+task.title,description:"Room: "+cur.name+"\nType: "+tt.l+"\n"+(task.detail||task.title)+"\n\nRaised by AV Audit on "+now+".",type:"Incident",priority:2,...(cfg.g?{group_name:cfg.g}:{})});
+      logL("t"+task.id,"✅","Ticket created","lok");
+    }catch(e){logL("t"+task.id,"❌","Failed: "+e.message,"ler");}
   }
-
+  document.getElementById("savtitle").textContent="Done ✓";
   document.getElementById("done-btn").style.display="flex";
 }
 
 function exportCSV(){
-  let csv="Room,Asset,Check,Status,Notes,Asset comment\n";
-  rooms.forEach(r=>{
-    r.assets.forEach(a=>{
-      const as=getAsset(r.id,a.id);
-      CHECKS.forEach(c=>{
-        const v=as.checks[c.id]||"not checked";
-        csv+=`"${r.name}","${a.name}","${c.label}","${v}","${(as.notes[c.id]||"").replace(/"/g,'""')}","${(as.comment||"").replace(/"/g,'""')}"\n`;
-      });
-    });
-  });
+  let csv="Room,Asset,Check,Status,Notes,Comment\n";
+  rooms.forEach(r=>{r.assets.forEach(a=>{const as=gAs(r.id,a.id);CHECKS.forEach(c=>{const v=as.checks[c.id]||"not checked";csv+=`"${r.name}","${a.name}","${c.l}","${v}","${(as.notes[c.id]||"").replace(/"/g,'""')}","${(as.comment||"").replace(/"/g,'""')}"\n`;});});});
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  const a=document.createElement("a");
-  a.href=url;a.download="av_audit_"+new Date().toISOString().slice(0,10)+".csv";a.click();
-  toast("CSV exported ✓");
+  const a=document.createElement("a");a.href=url;a.download="av_audit_"+new Date().toISOString().slice(0,10)+".csv";a.click();toast("CSV exported ✓");
 }
 
-function esc(s){
-  return String(s||"")
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-async function runDiagnostic(){
-  const domain=document.getElementById("fs-domain").value.trim();
-  const key=document.getElementById("fs-key").value.trim();
-  if(!domain||!key){toast("Enter domain and API key first");return;}
-  const btn=document.getElementById("diag-btn");
-  const out=document.getElementById("diag-result");
-  btn.textContent="Running…";btn.disabled=true;
-  out.style.display="block";
-  out.textContent="Connecting to /api/test…";
-  try{
-    const res=await fetch("/api/test",{
-      headers:{"x-fs-domain":domain,"x-fs-key":key,"Content-Type":"application/json"}
-    });
-    const data=await res.json();
-    out.textContent=JSON.stringify(data,null,2);
-  }catch(e){
-    out.textContent="Error: "+e.message;
-  }finally{
-    btn.textContent="🔍 Run connection diagnostic";btn.disabled=false;
-  }
-}
-
-loadConfig();
+loadCfg();
 </script>
 </body>
 </html>
