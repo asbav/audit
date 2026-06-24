@@ -297,17 +297,28 @@ async function connectFS(){
   cfg={domain,key,group:document.getElementById("fs-group").value.trim()};
   saveConfig();
   const btn=document.getElementById("connect-btn");
-  btn.innerHTML='<div class="spin"></div> Connecting…';btn.disabled=true;
+  btn.innerHTML='<div class="spin"></div> Loading assets…';btn.disabled=true;
   try{
-    const result=await fsCall("GET","/api/v2/assets?per_page=100&page=1");
-    if(result.status>=400)throw new Error("Freshservice returned "+result.status+". Check your domain and API key.");
-    const assets=(result.body.assets||result.body.items||[]);
+    // Proxy handles full pagination — just one call needed
+    const result=await fsCall("GET","/api/v2/assets");
+    if(result.error)throw new Error(result.error+(result.detail?" — "+result.detail:""));
+    const assets=result.assets||result.items||[];
+    if(!assets.length){
+      toast("No assets returned. Check API key permissions in Freshservice.",6000);
+      console.warn("Raw response:",result);
+      return;
+    }
+    btn.innerHTML='<div class="spin"></div> Grouping '+assets.length+' assets…';
     rooms=groupByLocation(assets);
-    if(!rooms.length){toast("No assets found. Make sure assets have a location assigned in Freshservice.");return;}
-    toast("Loaded "+rooms.length+" location"+(rooms.length!==1?"s":""));
+    // Include rooms with no location as individual entries
+    if(!rooms.length){
+      toast("Assets found ("+assets.length+") but none have a location set in Freshservice.",6000);
+      return;
+    }
+    toast("Loaded "+assets.length+" assets across "+rooms.length+" location"+(rooms.length!==1?"s":""));
     goRooms();
   }catch(e){
-    toast("Failed: "+e.message,6000);
+    toast("Failed: "+e.message,7000);
     console.error(e);
   }finally{
     btn.innerHTML="Connect &amp; load rooms";btn.disabled=false;
@@ -317,11 +328,25 @@ async function connectFS(){
 function groupByLocation(assets){
   const map={};
   assets.forEach(a=>{
-    const loc=a.location_name||a.location||"No location set";
+    // Freshservice can store location in several places
+    const loc =
+      a.location_name ||
+      (a.location && typeof a.location==="string" ? a.location : null) ||
+      (a.location && a.location.name ? a.location.name : null) ||
+      (a.type_fields && a.type_fields.location_id ? "Location #"+a.type_fields.location_id : null) ||
+      "⚠ No location set";
     if(!map[loc])map[loc]={name:loc,id:"loc_"+encodeURIComponent(loc),assets:[]};
-    map[loc].assets.push({id:a.id,name:a.display_name||a.name||"Asset "+a.id});
+    map[loc].assets.push({
+      id:   a.id,
+      name: a.display_name||a.name||a.asset_tag||"Asset "+a.id,
+    });
   });
-  return Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
+  return Object.values(map).sort((a,b)=>{
+    // Put "no location" at the bottom
+    if(a.name.startsWith("⚠"))return 1;
+    if(b.name.startsWith("⚠"))return -1;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 function loadDemo(){
